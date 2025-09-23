@@ -1,0 +1,53 @@
+[Unit]
+Description=Elderly Companion Robot - Privacy Storage Service
+Documentation=https://github.com/elderly-companion/robdog
+After=network.target
+Wants=network.target
+
+[Service]
+Type=exec
+User=elderly_companion
+Group=elderly_companion
+WorkingDirectory=/opt/elderly_companion
+Environment="ROS_DOMAIN_ID=42"
+Environment="RMW_IMPLEMENTATION=rmw_cyclonedx_cpp"
+Environment="PYTHONPATH=/opt/elderly_companion/install/lib/python3.10/site-packages"
+Environment="ELDERLY_COMPANION_DB_PATH=/opt/elderly_companion/data/privacy.db"
+Environment="ELDERLY_COMPANION_KEY_PATH=/opt/elderly_companion/keys/storage.key"
+
+# Source ROS2 and start privacy storage
+ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && source install/setup.bash && python3 src/shared/privacy_storage.py'
+
+# Restart configuration
+Restart=always
+RestartSec=20
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Resource limits (privacy storage needs more memory for encryption)
+MemoryMax=1.5G
+CPUQuota=40%
+
+# Security settings (extra security for privacy data)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/elderly_companion/data /opt/elderly_companion/keys /var/log/elderly_companion
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+# Privacy and data protection
+PrivateDevices=true
+ProtectKernelModules=true
+SystemCallFilter=@system-service
+SystemCallFilter=~@debug @mount @cpu-emulation @obsolete
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elderly-companion-privacy
+
+[Install]
+WantedBy=multi-user.target

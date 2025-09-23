@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # ROS2 Development Environment
+  ros2-dev:
+    build:
+      context: ./docker/ros2-dev
+      dockerfile: Dockerfile
+    container_name: robdog-ros2-dev
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./src:/workspace/src:rw
+      - ./config:/workspace/config:ro
+      - ./scripts:/workspace/scripts:ro
+    networks:
+      - robdog-network
+    privileged: true
+    devices:
+      - /dev/snd:/dev/snd  # Audio devices
+    command: tail -f /dev/null
+
+  # MQTT Broker for IoT Integration
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0.22
+    container_name: robdog-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt_data:/mosquitto/data
+      - mqtt_logs:/mosquitto/log
+    networks:
+      - robdog-network
+
+  # MediaMTX for WebRTC/RTSP streaming
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: robdog-mediamtx
+    ports:
+      - "8554:8554"  # RTSP
+      - "1935:1935"  # RTMP
+      - "8888:8888"  # WebRTC
+      - "8889:8889"  # WebRTC over TCP
+    volumes:
+      - ./config/mediamtx.yml:/mediamtx.yml:ro
+    networks:
+      - robdog-network
+
+  # PostgreSQL for development data
+  postgres-dev:
+    image: postgres:15
+    container_name: robdog-postgres-dev
+    environment:
+      POSTGRES_DB: robdog_dev
+      POSTGRES_USER: robdog
+      POSTGRES_PASSWORD: dev_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - robdog-network
+
+  # Redis for caching and session management
+  redis-dev:
+    image: redis:7-alpine
+    container_name: robdog-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - robdog-network
+
+  # Ollama for local LLM development
+  ollama-dev:
+    image: ollama/ollama:latest
+    container_name: robdog-ollama-dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - robdog-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+networks:
+  robdog-network:
+    driver: bridge
+
+volumes:
+  mqtt_data:
+  mqtt_logs:
+  postgres_data:
+  redis_data:
+  ollama_data:

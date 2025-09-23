@@ -1,0 +1,40 @@
+# Go To Location Action
+# Navigates the robot to a specific location safely
+
+# Goal
+geometry_msgs/Pose target_pose               # Target position and orientation
+string location_name                         # Human-readable location name
+float32 position_tolerance                   # Acceptable distance from target (meters)
+float32 orientation_tolerance                # Acceptable orientation error (radians)
+bool approach_elderly_person                 # Whether going to elderly person's location
+string approach_behavior                     # "direct", "gentle", "announce"
+SafetyConstraints safety_constraints         # Safety constraints to apply
+bool enable_obstacle_avoidance              # Whether to avoid dynamic obstacles
+float32 max_navigation_speed                # Maximum speed during navigation
+
+---
+
+# Result
+bool navigation_successful                   # Whether navigation completed successfully
+geometry_msgs/Pose final_pose               # Final achieved position
+float32 final_position_error                # Distance error from target
+float32 final_orientation_error             # Orientation error from target
+builtin_interfaces/Duration navigation_time  # Total time taken
+float32 path_length                         # Total distance traveled
+string completion_status                     # "success", "timeout", "obstacle", "emergency_stop"
+bool elderly_person_safe                    # Whether elderly person remained safe during navigation
+string[] safety_events                      # Any safety-related events during navigation
+
+---
+
+# Feedback
+geometry_msgs/Pose current_pose              # Current robot position
+float32 distance_remaining                   # Distance to target location
+float32 estimated_time_remaining            # Estimated time to reach target
+float32 current_speed                       # Current movement speed
+string navigation_status                     # "planning", "moving", "replanning", "paused"
+geometry_msgs/Pose[] planned_path           # Current planned path
+bool path_blocked                           # Whether current path is blocked
+string[] detected_obstacles                 # Types of obstacles detected
+float32 battery_consumption_rate            # Current battery usage rate
+bool elderly_person_visible                # Whether elderly person is in sight

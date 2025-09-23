@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>router_agent</name>
+  <version>0.1.0</version>
+  <description>Router Agent for Elderly Companion Robdog - Audio processing and AI inference</description>
+  
+  <maintainer email="dev@elderly-companion.com">Router Agent Team</maintainer>
+  <license>MIT</license>
+  
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  
+  <!-- Core ROS2 Dependencies -->
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>elderly_companion</depend>
+  
+  <!-- Audio Processing -->
+  <depend>audio_msgs</depend>
+  
+  <!-- Communication -->
+  <depend>rosbridge_library</depend>
+  
+  <!-- Python Dependencies (handled via pip) -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-scipy</exec_depend>
+  <exec_depend>python3-torch</exec_depend>
+  
+  <!-- Development Dependencies -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

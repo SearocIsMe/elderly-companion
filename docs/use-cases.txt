@@ -1,0 +1,86 @@
+## Use Cases
+
+### UC1 - 聊天 + 智能家居控制 , e.g. Light On/Off
+
+```markdown
+场景描述：
+- 主人与robdog在家生活
+- 主人在与robdog交流中，用清晰的指令通过robdog控制家里IoT设备
+- 主人与robdog聊天，用隐式沟通，让robdog执行相应动作，robdog通过语音与主人指令确认后执行
+Data Flows：
+Mic → Audio-ASR(text) → Guard(Pre-intent Guard) → Dialog&Intent(JSON: smart.home) → Guard(Post-Intent Validation) → Smart-home Adapter → Home Hub → ACK → Adapter → TTS → Speaker 
+Components：Audio-ASR、Guard、Dialog&Intent（可不启 LLM）、Smart-home Adapter、TTS
+DataType: USB Audio(UAC)、text、intent(JSON over gRPC/REST)、MQTT/REST/Matter、ack(JSON)、TTS PCM/Opus
+```
+
+### UC2 - Emergency Call by voice
+
+```markdown
+场景描述：
+- 主人与robdog在家生活
+- robdog识别出紧急执行的指令
+- 执行指令内容，同时打开远程视频监控流
+- 通过电话通知亲属，短信（附送视频流远程访问URL，以及密码）
+
+Data Flows:
+Mic → Audio-ASR(text:“救命…”) → Guard(SOS 命中→**直达**) → SIP/VoIP Adapter → Caregiver Phone （并行：WebRTC 上行、MQTT 告警）→ TTS “已为您拨通…” 
+Componets：Audio-ASR、Guard、SIP/VoIP Adapter、（可选 WebRTC 上行）、TTS
+Notes：SOS 命中绕过对话层，优先级最高；同时给家庭 App 发告警并可打开视频。
+```
+
+### U3 - Strolling/Following/Hang Out
+
+```markdown
+场景描述：
+- 日常外出遛弯，逛街，带这个robdog，如同带一条宠物狗
+- 能听懂主人指令
+- 主人可以带降噪耳机和降噪mic来与robdog来沟通
+Data Flows:
+Mic → Audio-ASR → Guard → Dialog&Intent(JSON: assist.follow) → Guard → **Action Agent**（限速/联锁）→ Go2 执行 → Go2/Action 反馈 → TTS 回报 
+Components：Audio-ASR、Guard、Dialog&Intent、TTS（Action/Go2 不在 Router 内，但与之配合）
+Datatype：intent(JSON)→ROS 2 actions/topics（/cmd_vel 等）→ 反馈再回到 TTS
+```
+
+### UC4 - 社区“15分钟生态圈”联动, — killer feature
+
+```markdown
+场景描述：跌倒检测 + AI应急管家
+- Anomaly Detector：整合雷达/热像/任务不动时间等事件；后期可以接入生命迹象IoT设备
+- AI recoginition: 识别emergency事件的关连方
+- Dispatch Orchestrator：通过Care/Doctor Adapter 同时派家政员与社区医生，通知关连方；
+- TTS 本地安抚；WebRTC 可选上行；家属实时收到 ETA/受理状态。
+- **Action Agent** 驱动 Go2 **绕行至面前**、播报、（可选）取急救包
+Data Flows:
+        1. video content flows: Camera-> webRTC -> Guard -> Smart-home Adapter -> FamilyApp/Care portal
+        2. control data flows: Guard-> SIP/VoIP Adapter
+Components: 
+Camera,WebRTC uplink, Family App/Care Portal
+```
+
+### UC5 - 陪伴老人：聊天 + 心理陪伴
+
+```markdown
+场景描述:
+- Emotion Screening 出分后，Dialog&Inten 选择策略：
+- Mic→ASR→情感检测：基于语音韵律/词汇情感+日常活动趋势判分
+- 播放“个性化老歌/故事”（Music/Media Adapter）；
+- 主动联系子女（Family Connect Adapter）；
+- TTS->温柔反馈与引导。
+- Guard（阈值/同意）：满足阈值且用户同意 → Care Dispatch Adapter 调度签约家政员；同时通知家属；
+
+Data Flows:
+Mic → Audio-ASR → Guard → Dialog&Intent(JSON: assist.follow) → Guard → **Action Agent**（限速/联锁）→ Go2 执行 → Go2/Action 反馈 → TTS 回报 
+Components：Audio-ASR、Guard、Dialog&Intent、TTS（Action/Go2 不在 Router 内，但与之配合）
+```
+
+### UC6 - 时光记忆银行
+
+```markdown
+场景描述:
+- Passive Memory Tagger：日常对话中抽取“供销社/老伴/最爱茉莉花”等标签（隐私合规存本地）；
+- Emotion Monitor 触发回忆处方：Media/Projection Adapter 放旧照/故事，Family Connect Adapter 发消息给子女，或通过 Care Adapter 下单“油墩子”等心愿；
+- TTS 输出“熟悉的声音”温柔陪伴。
+
+任务：
+请补充 data flow,和components
+```

@@ -1,0 +1,41 @@
+# Emergency Response Action
+# Coordinates robot response to emergency situations
+
+# Goal
+string emergency_type                        # Type of emergency detected
+int32 severity_level                         # Emergency severity (1-4)
+geometry_msgs/Pose emergency_location        # Location where emergency was detected
+geometry_msgs/Pose person_last_known_position # Last known position of elderly person
+bool person_responsive                       # Whether person is responding
+string[] required_actions                    # Specific actions to perform
+bool call_emergency_services                 # Whether to contact 911/emergency services
+bool notify_family                          # Whether to notify family members
+float32 response_time_limit                 # Maximum time allowed for response
+
+---
+
+# Result
+bool emergency_response_completed            # Whether response was completed
+string[] actions_completed                   # List of actions successfully performed
+bool emergency_services_contacted           # Whether emergency services were called
+bool family_notified                        # Whether family was successfully notified
+string incident_reference_id                # Emergency incident tracking ID
+geometry_msgs/Pose final_robot_position     # Final robot position after response
+geometry_msgs/Pose final_person_position    # Final known person position
+builtin_interfaces/Duration response_time    # Total time taken for response
+bool person_condition_stable               # Whether person's condition is stable
+string outcome_summary                      # Summary of emergency response outcome
+
+---
+
+# Feedback
+string current_action                       # Currently executing action
+float32 progress_percentage                 # Overall progress (0.0 to 1.0)
+geometry_msgs/Pose current_robot_position   # Current robot position
+bool person_located                         # Whether person has been located
+bool person_responsive_status              # Current person responsiveness
+string emergency_services_status           # Status of emergency services contact
+string family_notification_status          # Status of family notification
+bool video_stream_active                   # Whether emergency video stream is active
+string[] completed_actions                  # Actions completed so far
+builtin_interfaces/Duration elapsed_time    # Time elapsed since emergency started

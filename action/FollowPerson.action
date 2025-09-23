@@ -1,0 +1,36 @@
+# Follow Person Action
+# Enables the robot to follow an elderly person safely
+
+# Goal
+geometry_msgs/Pose target_person_position    # Initial position of person to follow
+float32 follow_distance                      # Preferred following distance (meters)
+float32 max_follow_speed                     # Maximum speed while following
+bool maintain_visual_contact                 # Whether to keep person in camera view
+bool enable_voice_interaction                # Whether to respond to voice during following
+string follow_mode                           # "close", "medium", "distant"
+SafetyConstraints safety_constraints         # Safety constraints to apply
+
+---
+
+# Result
+bool follow_completed                        # Whether following was completed successfully
+float32 total_distance_traveled             # Total distance traveled while following
+builtin_interfaces/Duration follow_duration  # Total time spent following
+geometry_msgs/Pose final_person_position    # Final known position of person
+geometry_msgs/Pose final_robot_position     # Final robot position
+string termination_reason                    # Why following ended
+bool person_safe                            # Whether person is in safe state
+string[] interactions_during_follow          # Voice interactions that occurred
+
+---
+
+# Feedback
+geometry_msgs/Pose current_person_position   # Current detected person position
+geometry_msgs/Pose current_robot_position    # Current robot position
+float32 current_distance_to_person          # Current distance to person
+float32 current_speed                       # Current movement speed
+bool person_in_sight                        # Whether person is currently visible
+string current_status                       # "following", "searching", "repositioning"
+float32 battery_level                       # Current battery level
+bool obstacle_detected                      # Whether obstacles are hindering movement
+EmotionData person_emotion_state            # Detected emotional state of person

@@ -1,0 +1,24 @@
+# Process Speech Service
+# Handles speech processing from audio input to intent classification
+
+# Request
+sensor_msgs/Audio audio_data          # Raw audio data
+string language_hint                  # Preferred language for processing
+float32 noise_threshold               # Background noise level
+bool emergency_mode                   # High-priority emergency processing
+string conversation_context          # Previous conversation context
+string user_profile                   # User profile for personalized processing
+
+---
+
+# Response
+bool processing_successful            # Whether speech was successfully processed
+SpeechResult speech_result            # Transcribed speech with metadata
+IntentResult intent_result            # Classified intent with parameters
+EmotionData emotion_analysis          # Emotional state analysis
+float32 processing_time_ms           # Time taken for processing
+string error_message                 # Error details if processing failed
+bool requires_clarification          # Whether user clarification is needed
+string[] clarification_questions      # Questions to ask for clarification
+float32 audio_quality_score         # Quality assessment of input audio
+bool voice_print_matched             # Whether voice matches known user

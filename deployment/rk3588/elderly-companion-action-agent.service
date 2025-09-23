@@ -1,0 +1,43 @@
+[Unit]
+Description=Elderly Companion Robot - Action Agent
+Documentation=https://github.com/elderly-companion/robdog
+After=network.target elderly-companion-router-agent.service
+Wants=network.target
+Requires=elderly-companion-router-agent.service
+
+[Service]
+Type=exec
+User=elderly_companion
+Group=elderly_companion
+WorkingDirectory=/opt/elderly_companion
+Environment="ROS_DOMAIN_ID=42"
+Environment="RMW_IMPLEMENTATION=rmw_cyclonedx_cpp"
+Environment="PYTHONPATH=/opt/elderly_companion/install/lib/python3.10/site-packages"
+
+# Source ROS2 and start action agent
+ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 run action_agent action_coordinator_node.py'
+
+# Restart configuration  
+Restart=always
+RestartSec=15
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Resource limits
+MemoryMax=1G
+CPUQuota=60%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/elderly_companion /var/log/elderly_companion
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elderly-companion-action
+
+[Install]
+WantedBy=multi-user.target

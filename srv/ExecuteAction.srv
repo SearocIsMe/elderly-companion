@@ -1,0 +1,23 @@
+# Execute Action Service
+# Executes validated actions through the Action Agent
+
+# Request
+IntentResult validated_intent         # Pre-validated intent to execute
+SafetyConstraints constraints         # Safety constraints to apply
+geometry_msgs/Pose target_location    # Target location (if applicable)
+string[] action_parameters           # Additional action parameters
+bool emergency_execution             # Whether this is emergency execution
+float32 timeout_seconds              # Maximum execution time allowed
+
+---
+
+# Response
+bool execution_started               # Whether action execution was initiated
+string action_id                     # Unique identifier for tracking
+float32 estimated_duration          # Estimated time to complete action
+string[] required_confirmations      # User confirmations needed during execution
+bool real_time_feedback_available   # Whether live updates will be provided
+string feedback_topic               # ROS topic for receiving updates
+string error_message                # Error details if execution failed
+SafetyConstraints applied_constraints # Actual constraints applied
+geometry_msgs/Pose current_position  # Robot's current position

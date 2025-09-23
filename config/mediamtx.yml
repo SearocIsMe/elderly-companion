@@ -1,0 +1,110 @@
+# Elderly Companion Robdog - MediaMTX Configuration
+# Media streaming server for WebRTC, RTSP, and RTMP
+
+# General settings
+logLevel: info
+logDestinations: [stdout]
+logFile: ""
+
+# API settings
+api: yes
+apiAddress: 0.0.0.0:9997
+
+# Metrics settings  
+metrics: no
+metricsAddress: 127.0.0.1:9998
+
+# RTSP settings
+rtspAddress: :8554
+protocols: [tcp, udp]
+encryption: "no"
+
+# RTMP settings
+rtmpAddress: :1935
+rtmpEncryption: "no"
+
+# HLS settings
+hlsAddress: :8888
+hlsEncryption: no
+hlsAllowOrigin: "*"
+hlsVariant: lowLatency
+hlsSegmentCount: 7
+hlsSegmentDuration: 1s
+hlsPartDuration: 200ms
+
+# WebRTC settings
+webrtcAddress: :8889
+webrtcEncryption: no
+webrtcAllowOrigin: "*"
+webrtcTrustedProxies: []
+webrtcICEServers:
+  - url: stun:stun.l.google.com:19302
+
+# Path settings for elderly companion streams
+paths:
+  # Main robot camera feed
+  robot_main_camera:
+    runOnInit: ""
+    runOnInitRestart: no
+    runOnDemand: ""
+    runOnDemandRestart: no
+    runOnDemandStartTimeout: 10s
+    runOnDemandCloseAfter: 10s
+    runOnReady: ""
+    runOnReadyRestart: no
+    runOnNotReady: ""
+    runOnRead: ""
+    runOnReadRestart: no
+    runOnUnread: ""
+
+  # Emergency monitoring stream
+  emergency_feed:
+    runOnInit: ""
+    runOnDemand: ""
+    runOnDemandCloseAfter: 10s
+
+  # Family monitoring stream (encrypted)
+  family_monitor:
+    runOnInit: ""
+    runOnDemand: ""
+    runOnDemandCloseAfter: 30s
+
+  # All other paths (catchall)
+  "~^.*":
+    # Source can be:
+    # - publisher (default)
+    # - redirect
+    # - rpiCamera
+    # - file
+    source: publisher
+    sourceProtocol: automatic
+    sourceAnyPortEnable: no
+    sourceFingerprint: ""
+    sourceOnDemand: no
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 10s
+    sourceRedirect: ""
+    disablePublisherOverride: no
+    fallback: ""
+
+    # Authentication
+    publishUser: ""
+    publishPass: ""
+    publishIPs: []
+    readUser: ""
+    readPass: ""
+    readIPs: []
+
+    # Custom commands for elderly care integration
+    runOnInit: ""
+    runOnInitRestart: no
+    runOnDemand: ""
+    runOnDemandRestart: no
+    runOnDemandStartTimeout: 10s
+    runOnDemandCloseAfter: 10s
+    runOnReady: ""
+    runOnReadyRestart: no
+    runOnNotReady: ""
+    runOnRead: ""
+    runOnReadRestart: no
+    runOnUnread: ""

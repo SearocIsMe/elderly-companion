@@ -1,0 +1,43 @@
+[Unit]
+Description=Elderly Companion Robot - Router Agent
+Documentation=https://github.com/elderly-companion/robdog
+After=network.target
+Wants=network.target
+Requires=network.target
+
+[Service]
+Type=exec
+User=elderly_companion
+Group=elderly_companion
+WorkingDirectory=/opt/elderly_companion
+Environment="ROS_DOMAIN_ID=42"
+Environment="RMW_IMPLEMENTATION=rmw_cyclonedx_cpp"
+Environment="PYTHONPATH=/opt/elderly_companion/install/lib/python3.10/site-packages"
+
+# Source ROS2 and start router agent
+ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch router_agent audio_pipeline.launch.py use_rknpu:=true elderly_mode:=true'
+
+# Restart configuration
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Resource limits for elderly care robot
+MemoryMax=2G
+CPUQuota=80%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/elderly_companion /var/log/elderly_companion
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elderly-companion-router
+
+[Install]
+WantedBy=multi-user.target

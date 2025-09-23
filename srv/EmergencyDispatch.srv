@@ -1,0 +1,29 @@
+# Emergency Dispatch Service
+# Handles emergency situations and coordinates response
+
+# Request
+string emergency_type                 # medical, fall, sos, security
+int32 severity_level                  # 1=low, 2=medium, 3=high, 4=critical
+geometry_msgs/Pose robot_location     # Current robot position
+geometry_msgs/Pose person_location    # Elderly person position (if known)
+string location_description           # Human-readable location
+sensor_msgs/Image[] camera_feed       # Visual context if available
+SpeechResult last_speech              # Last speech before emergency
+string[] additional_context           # Any additional relevant information
+bool manual_trigger                   # Whether manually triggered by family/caregiver
+
+---
+
+# Response
+bool dispatch_successful              # Whether emergency dispatch was successful
+string reference_id                   # Emergency incident reference ID
+string estimated_response_time        # ETA for help arrival
+string[] actions_taken                # List of actions performed
+string[] contacts_notified            # Emergency contacts that were reached
+bool emergency_services_contacted     # Whether 911/emergency services called
+bool family_notified                  # Whether family was notified
+bool robot_assistance_deployed        # Whether robot moved to assist
+string video_stream_url              # WebRTC URL for remote monitoring
+string access_credentials            # Temporary access for emergency responders
+string[] follow_up_instructions       # Instructions for elderly person
+int32 incident_priority               # Assigned priority in emergency system
