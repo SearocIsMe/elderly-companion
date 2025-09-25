@@ -54,23 +54,76 @@ The Elderly Companion Robdog is an intelligent quadruped robot designed specific
 - Node.js 18+
 
 ### Quick Start
+
+#### Step 1: Setup Project (Host Machine)
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd elderly-companion
 
-# Setup development environment
+# Setup development environment (host)
 ./scripts/setup_dev_env.sh
+```
 
-# Start development services
+#### Step 2: Start Services (Host Machine)
+```bash
+# Start all development services
 docker-compose up -d
 
-# Build ROS2 workspace
+# Verify all containers are running
+docker ps
+```
+
+You should see 5 containers running:
+- `robdog-ros2-dev` - ROS2 development environment
+- `robdog-mqtt` - MQTT broker (ports 1883, 9001)
+- `robdog-mediamtx` - Media streaming (ports 1935, 8554, 8888-8889)
+- `robdog-redis-dev` - Redis cache (port 6379)
+- `robdog-ollama-dev` - Ollama LLM server (port 11434)
+
+#### Step 3: Build ROS2 Workspace (Inside Container)
+```bash
+# Enter the ROS2 development container
+docker exec -it robdog-ros2-dev bash
+
+# Inside the container, build the workspace
+cd /workspace
+source /opt/ros/humble/setup.bash
 ./scripts/build_workspace.sh
 
-# Run tests
-./scripts/run_tests.sh
+# Exit the container
+exit
 ```
+
+#### Step 4: Run Tests (Inside Container)
+```bash
+# Enter the container and run tests
+docker exec -it robdog-ros2-dev bash -c "cd /workspace && ./scripts/run_tests.sh"
+```
+
+#### Alternative: One-line Commands
+```bash
+# Build workspace (from host)
+docker exec robdog-ros2-dev bash -c "cd /workspace && ./scripts/build_workspace.sh"
+
+# Run tests (from host)
+docker exec robdog-ros2-dev bash -c "cd /workspace && ./scripts/run_tests.sh"
+```
+
+### Troubleshooting
+
+If you encounter container conflicts:
+```bash
+# Stop and remove all containers
+docker-compose down
+
+# Remove old containers if needed
+docker container prune
+
+# Restart services
+docker-compose up -d
+```
+
 
 ## Project Structure
 

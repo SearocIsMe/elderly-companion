@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ROS2 Development Environment
   ros2-dev:
@@ -50,22 +48,6 @@ services:
     networks:
       - robdog-network
 
-  # PostgreSQL for development data
-  postgres-dev:
-    image: postgres:15
-    container_name: robdog-postgres-dev
-    environment:
-      POSTGRES_DB: robdog_dev
-      POSTGRES_USER: robdog
-      POSTGRES_PASSWORD: dev_password_123
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - robdog-network
-
   # Redis for caching and session management
   redis-dev:
     image: redis:7-alpine
@@ -102,6 +84,5 @@ networks:
 volumes:
   mqtt_data:
   mqtt_logs:
-  postgres_data:
   redis_data:
   ollama_data:

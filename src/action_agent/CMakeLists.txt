@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(action_agent)
 
 # Default to C++17
@@ -22,8 +22,6 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(elderly_companion REQUIRED)
-find_package(nav2_common REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
@@ -34,9 +32,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   nodes/action_coordinator_node.py
-  nodes/safety_controller_node.py
-  nodes/navigation_controller_node.py
-  nodes/emergency_response_node.py
+  nodes/unitree_go2_bridge_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -59,10 +55,10 @@ if(BUILD_TESTING)
   # Linting
   ament_lint_auto_find_test_dependencies()
   
-  # Python tests
-  ament_add_pytest_test(test_action_coordinator test/test_action_coordinator.py)
-  ament_add_pytest_test(test_safety_controller test/test_safety_controller.py)
-  ament_add_pytest_test(test_navigation_controller test/test_navigation_controller.py)
+  # Python tests (commented out until test files are created)
+  # ament_add_pytest_test(test_action_coordinator test/test_action_coordinator.py)
+  # ament_add_pytest_test(test_safety_controller test/test_safety_controller.py)
+  # ament_add_pytest_test(test_navigation_controller test/test_navigation_controller.py)
 endif()
 
 ament_package()

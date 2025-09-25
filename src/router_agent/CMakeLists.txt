@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(router_agent)
 
 # Default to C++17
@@ -18,9 +18,6 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(elderly_companion REQUIRED)
-find_package(audio_msgs REQUIRED)
-find_package(rosbridge_library REQUIRED)
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
@@ -30,9 +27,10 @@ install(PROGRAMS
   nodes/audio_processor_node.py
   nodes/speech_recognition_node.py
   nodes/emotion_analyzer_node.py
-  nodes/intent_classifier_node.py
   nodes/safety_guard_node.py
   nodes/dialog_manager_node.py
+  nodes/mqtt_adapter_node.py
+  nodes/sip_voip_adapter_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -55,10 +53,10 @@ if(BUILD_TESTING)
   # Linting
   ament_lint_auto_find_test_dependencies()
   
-  # Python tests
-  ament_add_pytest_test(test_audio_processor test/test_audio_processor.py)
-  ament_add_pytest_test(test_speech_recognition test/test_speech_recognition.py)
-  ament_add_pytest_test(test_emotion_analyzer test/test_emotion_analyzer.py)
+  # Python tests (commented out until test files are created)
+  # ament_add_pytest_test(test_audio_processor test/test_audio_processor.py)
+  # ament_add_pytest_test(test_speech_recognition test/test_speech_recognition.py)
+  # ament_add_pytest_test(test_emotion_analyzer test/test_emotion_analyzer.py)
 endif()
 
 ament_package()

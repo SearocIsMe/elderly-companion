@@ -41,6 +41,8 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies for elderly companion system
 RUN pip3 install \
+    empy \
+    lark \
     sherpa-onnx==1.12.14 \
     silero-vad==6.0.0 \
     transformers==4.21.3 \
@@ -78,7 +80,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-cartographer \
     ros-humble-cartographer-ros \
     ros-humble-robot-localization \
-    ros-humble-rmw-cyclonedx-cpp \
+    ros-humble-rmw-cyclonedds-cpp \
     ros-humble-rosbridge-suite \
     ros-humble-mqtt-client \
     && rm -rf /var/lib/apt/lists/*
@@ -95,7 +97,7 @@ RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN echo "source /workspace/install/setup.bash" >> ~/.bashrc || true
 
 # Set default RMW implementation
-ENV RMW_IMPLEMENTATION=rmw_cyclonedx_cpp
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 # Create entrypoint script
 RUN echo '#!/bin/bash\n\

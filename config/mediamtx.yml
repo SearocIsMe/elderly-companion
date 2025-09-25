@@ -37,8 +37,7 @@ webrtcAddress: :8889
 webrtcEncryption: no
 webrtcAllowOrigin: "*"
 webrtcTrustedProxies: []
-webrtcICEServers:
-  - url: stun:stun.l.google.com:19302
+webrtcICEServers: ["stun:stun.l.google.com:19302"]
 
 # Path settings for elderly companion streams
 paths:
