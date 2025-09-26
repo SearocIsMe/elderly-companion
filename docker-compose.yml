@@ -13,6 +13,12 @@ services:
       - ./src:/workspace/src:rw
       - ./config:/workspace/config:ro
       - ./scripts:/workspace/scripts:ro
+      - ./package.xml:/workspace/package.xml:ro
+      - ./CMakeLists.txt:/workspace/CMakeLists.txt:ro
+      - ./msg:/workspace/msg:ro
+      - ./srv:/workspace/srv:ro
+      - ./action:/workspace/action:ro
+      - ./tests:/workspace/tests:rw
     networks:
       - robdog-network
     privileged: true

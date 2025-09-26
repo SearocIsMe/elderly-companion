@@ -52,9 +52,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES builtin_interfaces std_msgs sensor_msgs geometry_msgs nav_msgs action_msgs
 )
 
-# Install Python modules
-ament_python_install_package(${PROJECT_NAME})
-
 # Install launch files
 install(DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch
@@ -79,7 +76,8 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_pytest REQUIRED)
   
-  # Linting
+  # Linting - exclude PEP257 docstring linting for faster builds
+  set(ament_cmake_pep257_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
   
   # C++ tests

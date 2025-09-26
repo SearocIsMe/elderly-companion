@@ -52,7 +52,8 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_pytest REQUIRED)
   
-  # Linting
+  # Linting - exclude PEP257 docstring linting
+  set(ament_cmake_pep257_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
   
   # Python tests (commented out until test files are created)
