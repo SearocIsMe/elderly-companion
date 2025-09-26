@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Comprehensive Testing Framework for Elderly Companion Robdog
-Tests all critical elderly care scenarios, safety systems, and emergency responses
+Comprehensive Testing Framework for Elderly Companion Robdog.
+
+Tests all critical elderly care scenarios, safety systems, and emergency responses.
 """
 
 import unittest
@@ -53,14 +54,14 @@ class ElderlyCompanionTestFramework:
         self.test_logger = self.setup_test_logging()
 
     def setup_test_logging(self):
-        """Setup test logging"""
+        """Set up test logging."""
         import logging
         logger = logging.getLogger('elderly_companion_tests')
         logger.setLevel(logging.INFO)
         return logger
 
     def run_all_tests(self) -> Dict[str, bool]:
-        """Run all test suites"""
+        """Run all test suites."""
         self.test_logger.info("🧪 Starting Elderly Companion Robot Test Suite")
         
         test_suites = [
@@ -89,15 +90,15 @@ class ElderlyCompanionTestFramework:
 
 
 class AudioProcessingPipelineTests(unittest.TestCase):
-    """Test audio processing pipeline components"""
+    """Test audio processing pipeline components."""
 
     def setUp(self):
-        """Setup test environment"""
+        """Setup test environment."""
         rclpy.init()
         self.node = Node('test_audio_pipeline')
 
     def tearDown(self):
-        """Cleanup test environment"""
+        """Clean up test environment."""
         self.node.destroy_node()
         rclpy.shutdown()
 
@@ -185,7 +186,7 @@ class AudioProcessingPipelineTests(unittest.TestCase):
 
 
 class SafetySystemTests(unittest.TestCase):
-    """Test safety system components"""
+    """Test safety system components."""
 
     def test_emergency_response_time(self):
         """Test emergency response time < 200ms requirement"""
@@ -233,7 +234,7 @@ class SafetySystemTests(unittest.TestCase):
 
 
 class EmergencyResponseTests(unittest.TestCase):
-    """Test emergency response workflows"""
+    """Test emergency response workflows."""
 
     def test_fall_detection_response(self):
         """Test response to fall detection"""
@@ -274,7 +275,7 @@ class EmergencyResponseTests(unittest.TestCase):
 
 
 class ElderlySpecificScenarioTests(unittest.TestCase):
-    """Test elderly-specific use case scenarios"""
+    """Test elderly-specific use case scenarios."""
 
     def test_uc1_smart_home_control(self):
         """Test UC1 - Smart Home Control scenario"""
@@ -348,7 +349,7 @@ class ElderlySpecificScenarioTests(unittest.TestCase):
 
 
 class SafetyValidationTests(unittest.TestCase):
-    """Critical safety validation tests for elderly care"""
+    """Critical safety validation tests for elderly care."""
 
     def test_emergency_stop_response_time(self):
         """Test emergency stop response time"""
@@ -413,7 +414,7 @@ class SafetyValidationTests(unittest.TestCase):
 
 
 class ElderlyScenarioTests(unittest.TestCase):
-    """Test real-world elderly care scenarios"""
+    """Test real-world elderly care scenarios."""
 
     def test_daily_routine_scenarios(self):
         """Test typical daily routine interactions"""
@@ -472,7 +473,7 @@ class ElderlyScenarioTests(unittest.TestCase):
 
 
 class MockRobotHardware:
-    """Mock robot hardware for testing"""
+    """Mock robot hardware for testing."""
     
     def __init__(self):
         self.position = {"x": 0, "y": 0, "z": 0.25}
@@ -512,7 +513,7 @@ class MockRobotHardware:
 
 
 class MockElderlyPerson:
-    """Mock elderly person for testing"""
+    """Mock elderly person for testing."""
     
     def __init__(self):
         self.position = {"x": 2, "y": 0}
@@ -542,7 +543,7 @@ class MockElderlyPerson:
 
 
 class TestRunner:
-    """Main test runner for elderly companion robot"""
+    """Main test runner for elderly companion robot."""
     
     def __init__(self):
         self.framework = ElderlyCompanionTestFramework()
@@ -615,7 +616,7 @@ class TestRunner:
 
 
 def main():
-    """Main test execution"""
+    """Run main test execution."""
     print("🤖 Elderly Companion Robdog - Comprehensive Test Suite")
     print("=" * 60)
     

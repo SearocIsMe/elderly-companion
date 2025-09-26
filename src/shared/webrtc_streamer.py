@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-WebRTC Streamer for Elderly Companion Robdog
-Provides real-time video streaming to family members during emergencies
-Integrates with MediaMTX and provides secure video access
+WebRTC Streamer for Elderly Companion Robdog.
+
+Provides real-time video streaming to family members during emergencies.
+Integrates with MediaMTX and provides secure video access.
 """
 
 import rclpy
@@ -48,7 +49,7 @@ from elderly_companion.msg import EmergencyAlert, HealthStatus
 
 
 class StreamState(Enum):
-    """Video stream states"""
+    """Video stream states."""
     IDLE = "idle"
     INITIALIZING = "initializing"
     STREAMING = "streaming"
@@ -58,7 +59,7 @@ class StreamState(Enum):
 
 
 class StreamQuality(Enum):
-    """Video quality levels"""
+    """Video quality levels."""
     LOW = "low"          # 480p, 15fps, 500kbps
     MEDIUM = "medium"    # 720p, 30fps, 1Mbps
     HIGH = "high"        # 1080p, 30fps, 2Mbps
@@ -67,7 +68,7 @@ class StreamQuality(Enum):
 
 @dataclass
 class StreamSession:
-    """Video stream session data"""
+    """Video stream session data."""
     session_id: str
     family_member_id: str
     stream_type: str  # emergency, monitoring, communication
@@ -83,7 +84,7 @@ class StreamSession:
 
 @dataclass
 class StreamConfig:
-    """WebRTC stream configuration"""
+    """WebRTC stream configuration."""
     width: int
     height: int
     fps: int
@@ -214,7 +215,7 @@ class WebRTCStreamerNode(Node):
         self.get_logger().info("WebRTC Streamer Node initialized - Emergency video streaming ready")
 
     def initialize_stream_configs(self) -> Dict[StreamQuality, StreamConfig]:
-        """Initialize video quality configurations"""
+        """Initialize video quality configurations."""
         return {
             StreamQuality.LOW: StreamConfig(
                 width=640, height=480, fps=15, bitrate=500000
@@ -231,7 +232,7 @@ class WebRTCStreamerNode(Node):
         }
 
     def initialize_webrtc_components(self):
-        """Initialize WebRTC components"""
+        """Initialize WebRTC components."""
         try:
             if not WEBRTC_AVAILABLE:
                 return
@@ -251,7 +252,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"WebRTC components initialization error: {e}")
 
     def initialize_camera(self):
-        """Initialize camera for video capture"""
+        """Initialize camera for video capture."""
         try:
             if not WEBRTC_AVAILABLE:
                 return
@@ -274,7 +275,7 @@ class WebRTCStreamerNode(Node):
             self.camera = None
 
     def handle_emergency_alert_callback(self, msg: EmergencyAlert):
-        """Handle emergency alert and start emergency streaming"""
+        """Handle emergency alert and start emergency streaming."""
         try:
             self.get_logger().critical(f"EMERGENCY: Starting video stream for {msg.emergency_type}")
             
@@ -294,7 +295,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Emergency streaming setup error: {e}")
 
     def create_emergency_stream_session(self, alert: EmergencyAlert) -> StreamSession:
-        """Create emergency stream session"""
+        """Create emergency stream session."""
         session_id = f"emergency_{int(time.time())}"
         
         session = StreamSession(
@@ -312,7 +313,7 @@ class WebRTCStreamerNode(Node):
         return session
 
     def generate_access_token(self, session: StreamSession) -> str:
-        """Generate secure access token for stream"""
+        """Generate secure access token for stream."""
         try:
             token_data = {
                 'session_id': session.session_id,
@@ -336,7 +337,7 @@ class WebRTCStreamerNode(Node):
             return ""
 
     def start_emergency_stream(self, session: StreamSession, access_token: str):
-        """Start emergency video stream"""
+        """Start emergency video stream."""
         try:
             if self.mediamtx_enabled:
                 # Use MediaMTX for stream distribution
@@ -355,7 +356,7 @@ class WebRTCStreamerNode(Node):
             self.current_state = StreamState.ERROR
 
     def start_mediamtx_stream(self, session: StreamSession) -> str:
-        """Start stream via MediaMTX"""
+        """Start stream via MediaMTX."""
         try:
             # Configure MediaMTX stream
             stream_path = f"emergency_feed_{session.session_id}"
@@ -373,7 +374,7 @@ class WebRTCStreamerNode(Node):
             return ""
 
     def start_gstreamer_pipeline(self, stream_path: str, quality: StreamQuality):
-        """Start GStreamer pipeline for video streaming"""
+        """Start GStreamer pipeline for video streaming."""
         try:
             if not WEBRTC_AVAILABLE:
                 return
@@ -398,7 +399,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"GStreamer pipeline error: {e}")
 
     def publish_stream_access(self, session: StreamSession, access_token: str):
-        """Publish stream access information for family app"""
+        """Publish stream access information for family app."""
         try:
             access_info = {
                 'session_id': session.session_id,
@@ -425,7 +426,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Stream access publishing error: {e}")
 
     def camera_image_callback(self, msg: Image):
-        """Handle camera image from ROS2 camera node"""
+        """Handle camera image from ROS2 camera node."""
         try:
             if self.current_state != StreamState.STREAMING:
                 return
@@ -439,7 +440,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Camera image callback error: {e}")
 
     def start_signaling_server(self):
-        """Start WebRTC signaling server"""
+        """Start WebRTC signaling server."""
         try:
             def run_server():
                 if WEBRTC_AVAILABLE:
@@ -456,7 +457,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Signaling server start error: {e}")
 
     def start_aiohttp_signaling_server(self):
-        """Start aiohttp server for WebRTC signaling"""
+        """Start aiohttp server for WebRTC signaling."""
         try:
             app = web.Application()
             
@@ -480,7 +481,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Aiohttp signaling server error: {e}")
 
     async def cors_middleware(self, request, handler):
-        """CORS middleware for cross-origin requests"""
+        """Handle CORS middleware for cross-origin requests."""
         response = await handler(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
@@ -488,7 +489,7 @@ class WebRTCStreamerNode(Node):
         return response
 
     async def handle_stream_start_request(self, request):
-        """Handle stream start request from family app"""
+        """Handle stream start request from family app."""
         try:
             data = await request.json()
             
@@ -532,7 +533,7 @@ class WebRTCStreamerNode(Node):
             return web.json_response({'error': str(e)}, status=500)
 
     async def handle_webrtc_offer(self, request):
-        """Handle WebRTC offer from client"""
+        """Handle WebRTC offer from client."""
         try:
             data = await request.json()
             session_id = data['session_id']
@@ -572,7 +573,7 @@ class WebRTCStreamerNode(Node):
             return web.json_response({'error': str(e)}, status=500)
 
     async def handle_webrtc_answer(self, request):
-        """Handle WebRTC answer from client"""
+        """Handle WebRTC answer from client."""
         try:
             data = await request.json()
             session_id = data['session_id']
@@ -594,7 +595,7 @@ class WebRTCStreamerNode(Node):
             return web.json_response({'error': str(e)}, status=500)
 
     async def handle_ice_candidate(self, request):
-        """Handle ICE candidate from client"""
+        """Handle ICE candidate from client."""
         try:
             data = await request.json()
             session_id = data['session_id']
@@ -614,7 +615,7 @@ class WebRTCStreamerNode(Node):
             return web.json_response({'error': str(e)}, status=500)
 
     async def handle_stream_status(self, request):
-        """Handle stream status request"""
+        """Handle stream status request."""
         try:
             session_id = request.match_info['session_id']
             session = self.active_streams.get(session_id)
@@ -638,7 +639,7 @@ class WebRTCStreamerNode(Node):
             return web.json_response({'error': str(e)}, status=500)
 
     def validate_access_token(self, token: str) -> bool:
-        """Validate access token"""
+        """Validate access token."""
         try:
             if not self.auth_enabled:
                 return True
@@ -660,7 +661,7 @@ class WebRTCStreamerNode(Node):
             return False
 
     def cleanup_expired_streams(self):
-        """Clean up expired stream sessions"""
+        """Clean up expired stream sessions."""
         try:
             current_time = datetime.now()
             expired_sessions = []
@@ -677,7 +678,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Stream cleanup error: {e}")
 
     def terminate_stream_session(self, session_id: str):
-        """Terminate stream session"""
+        """Terminate stream session."""
         try:
             session = self.active_streams.get(session_id)
             if not session:
@@ -702,7 +703,7 @@ class WebRTCStreamerNode(Node):
             self.get_logger().error(f"Stream termination error: {e}")
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'camera') and self.camera:
                 self.camera.release()
@@ -716,7 +717,7 @@ class WebRTCStreamerNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

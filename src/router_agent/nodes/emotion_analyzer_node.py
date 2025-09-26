@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Emotion Analyzer Node for Elderly Companion Robdog
-Analyzes emotional content from speech recognition results and audio features
-Specialized for elderly emotional patterns and health indicators
+Emotion Analyzer Node for Elderly Companion Robdog.
+
+Analyzes emotional content from speech recognition results and audio features.
+Specialized for elderly emotional patterns and health indicators.
 """
 
 import rclpy
@@ -28,6 +29,7 @@ from elderly_companion.msg import SpeechResult, EmotionData
 class EmotionAnalyzerNode(Node):
     """
     Emotion Analysis Node specialized for elderly care.
+    
     Combines text-based emotion recognition with audio feature analysis
     to detect emotional states, stress levels, and health indicators.
     """
@@ -126,7 +128,7 @@ class EmotionAnalyzerNode(Node):
         self.get_logger().info("Emotion Analyzer Node initialized successfully")
 
     def initialize_emotion_models(self):
-        """Initialize emotion analysis models"""
+        """Initialize emotion analysis models."""
         try:
             # Initialize text-based emotion classifier
             self.get_logger().info("Loading text emotion classifier...")
@@ -151,7 +153,7 @@ class EmotionAnalyzerNode(Node):
             self.text_emotion_classifier = None
 
     def initialize_audio_analyzer(self):
-        """Initialize audio feature analysis components"""
+        """Initialize audio feature analysis components."""
         try:
             # Audio feature extraction parameters
             self.audio_params = {
@@ -167,7 +169,7 @@ class EmotionAnalyzerNode(Node):
             self.get_logger().error(f"Audio analyzer initialization failed: {e}")
 
     def analyze_speech_emotion_callback(self, msg: SpeechResult):
-        """Analyze emotion from speech recognition results"""
+        """Analyze emotion from speech recognition results."""
         try:
             self.get_logger().debug(f"Analyzing emotion for text: '{msg.text}'")
             
@@ -206,7 +208,7 @@ class EmotionAnalyzerNode(Node):
             self.get_logger().error(f"Speech emotion analysis error: {e}")
 
     def analyze_text_emotion(self, text: str) -> EmotionData:
-        """Analyze emotion from text content"""
+        """Analyze emotion from text content."""
         emotion_data = EmotionData()
         
         try:
@@ -246,7 +248,7 @@ class EmotionAnalyzerNode(Node):
         return emotion_data
 
     def pattern_based_emotion_analysis(self, text: str) -> EmotionData:
-        """Fallback pattern-based emotion analysis"""
+        """Provide fallback pattern-based emotion analysis."""
         emotion_data = EmotionData()
         text_lower = text.lower()
         
@@ -294,7 +296,7 @@ class EmotionAnalyzerNode(Node):
         return emotion_data
 
     def map_to_elderly_emotions(self, emotion: str) -> str:
-        """Map general emotions to elderly-care specific categories"""
+        """Map general emotions to elderly-care specific categories."""
         emotion_mapping = {
             'joy': 'happy',
             'happiness': 'happy',
@@ -309,7 +311,7 @@ class EmotionAnalyzerNode(Node):
         return emotion_mapping.get(emotion, emotion)
 
     def enhance_with_elderly_patterns(self, emotion_data: EmotionData, text: str):
-        """Enhance emotion analysis with elderly-specific patterns"""
+        """Enhance emotion analysis with elderly-specific patterns."""
         try:
             text_lower = text.lower()
             
@@ -375,7 +377,7 @@ class EmotionAnalyzerNode(Node):
             self.get_logger().error(f"Elderly pattern enhancement error: {e}")
 
     def calculate_emotional_dimensions(self, emotion_data: EmotionData):
-        """Calculate valence and arousal dimensions"""
+        """Calculate valence and arousal dimensions."""
         try:
             emotion = emotion_data.primary_emotion
             
@@ -406,7 +408,7 @@ class EmotionAnalyzerNode(Node):
             emotion_data.arousal = 0.3
 
     def analyze_audio_features_callback(self, msg: Audio):
-        """Analyze emotion from audio features"""
+        """Analyze emotion from audio features."""
         try:
             # Extract audio data
             audio_data = np.frombuffer(msg.data, dtype=np.float32)
@@ -431,7 +433,7 @@ class EmotionAnalyzerNode(Node):
             self.get_logger().error(f"Audio feature analysis error: {e}")
 
     def extract_audio_emotion_features(self, audio_data: np.ndarray) -> Dict[str, float]:
-        """Extract emotion-relevant features from audio"""
+        """Extract emotion-relevant features from audio."""
         try:
             features = {}
             
@@ -470,7 +472,7 @@ class EmotionAnalyzerNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Action Coordinator Node for Elderly Companion Robdog
-Central coordinator for all robot actions, navigation, and safety-controlled movement
-Handles UC3 (Following/Strolling) and emergency response movement
+Action Coordinator Node for Elderly Companion Robdog.
+
+Central coordinator for all robot actions, navigation, and safety-controlled movement.
+Handles UC3 (Following/Strolling) and emergency response movement.
 """
 
 import rclpy
@@ -36,7 +37,7 @@ from elderly_companion.action import (
 
 
 class ActionState(Enum):
-    """Action execution states"""
+    """Action execution states."""
     IDLE = "idle"
     PLANNING = "planning"
     EXECUTING = "executing"
@@ -47,7 +48,7 @@ class ActionState(Enum):
 
 
 class ActionPriority(Enum):
-    """Action priority levels"""
+    """Action priority levels."""
     LOW = 1
     NORMAL = 2
     HIGH = 3
@@ -56,7 +57,7 @@ class ActionPriority(Enum):
 
 @dataclass
 class ActionRequest:
-    """Action request data structure"""
+    """Action request data structure."""
     request_id: str
     action_type: str
     parameters: Dict[str, Any]
@@ -211,7 +212,7 @@ class ActionCoordinatorNode(Node):
         self.get_logger().info("Action Coordinator Node initialized - Ready for elderly companion actions")
 
     def handle_validated_intent_callback(self, msg: IntentResult):
-        """Handle validated intents from router agent"""
+        """Handle validated intents from router agent."""
         try:
             if msg.intent_type in ['follow', 'go_to', 'emergency']:
                 self.get_logger().info(f"Received validated action intent: {msg.intent_type}")
@@ -233,7 +234,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Validated intent handling error: {e}")
 
     def handle_emergency_alert_callback(self, msg: EmergencyAlert):
-        """Handle emergency alerts - highest priority actions"""
+        """Handle emergency alerts - highest priority actions."""
         try:
             self.get_logger().critical(f"EMERGENCY ACTION: {msg.emergency_type}")
             
@@ -261,7 +262,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Emergency alert handling error: {e}")
 
     def update_safety_constraints_callback(self, msg: SafetyConstraints):
-        """Update current safety constraints"""
+        """Update current safety constraints."""
         try:
             self.current_constraints = msg
             
@@ -275,7 +276,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Safety constraints update error: {e}")
 
     def odometry_callback(self, msg: Odometry):
-        """Update robot pose from odometry"""
+        """Update robot pose from odometry."""
         try:
             self.robot_pose = msg.pose.pose
             self.robot_twist = msg.twist.twist
@@ -284,7 +285,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Odometry callback error: {e}")
 
     def laser_scan_callback(self, msg: LaserScan):
-        """Process laser scan for obstacle detection"""
+        """Process laser scan for obstacle detection."""
         try:
             # Simple obstacle detection
             min_distance = min(msg.ranges)
@@ -298,7 +299,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Laser scan callback error: {e}")
 
     def execute_action_request(self, request: ActionRequest):
-        """Execute action request"""
+        """Execute action request."""
         try:
             # Check if emergency action should interrupt current action
             if (request.priority == ActionPriority.EMERGENCY or 
@@ -333,7 +334,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Action execution error: {e}")
 
     def start_follow_action(self, request: ActionRequest):
-        """Start following action"""
+        """Start following action."""
         try:
             self.get_logger().info("Starting follow person action")
             self.current_state = ActionState.EXECUTING
@@ -391,7 +392,7 @@ class ActionCoordinatorNode(Node):
             self.current_state = ActionState.FAILED
 
     def start_go_to_action(self, request: ActionRequest):
-        """Start go to location action"""
+        """Start go to location action."""
         try:
             self.get_logger().info("Starting go to location action")
             self.current_state = ActionState.EXECUTING
@@ -444,7 +445,7 @@ class ActionCoordinatorNode(Node):
             self.current_state = ActionState.FAILED
 
     def start_emergency_response_action(self, request: ActionRequest):
-        """Start emergency response action"""
+        """Start emergency response action."""
         try:
             self.get_logger().critical("Starting emergency response action")
             self.current_state = ActionState.EXECUTING
@@ -501,7 +502,7 @@ class ActionCoordinatorNode(Node):
             self.current_state = ActionState.FAILED
 
     def emergency_stop(self):
-        """Emergency stop all motion"""
+        """Perform emergency stop of all motion."""
         try:
             self.emergency_stop_active = True
             self.cmd_vel_pub.publish(Twist())  # Stop robot
@@ -512,7 +513,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Emergency stop error: {e}")
 
     def stop_current_action(self):
-        """Stop current action"""
+        """Stop current action."""
         try:
             if self.current_action:
                 self.get_logger().info(f"Stopping current action: {self.current_action.action_type}")
@@ -523,7 +524,7 @@ class ActionCoordinatorNode(Node):
             self.get_logger().error(f"Stop current action error: {e}")
 
     def safety_monitoring_loop(self):
-        """Safety monitoring loop - runs at 10Hz"""
+        """Run safety monitoring loop at 10Hz."""
         try:
             # Reset emergency stop if safe
             if (self.emergency_stop_active and 
@@ -542,7 +543,7 @@ class ActionCoordinatorNode(Node):
 
     # Action server callbacks
     def follow_person_callback(self, goal_handle):
-        """Follow person action server callback"""
+        """Handle follow person action server callback."""
         self.get_logger().info("Follow person goal received")
         goal_handle.succeed()
         result = FollowPerson.Result()
@@ -550,7 +551,7 @@ class ActionCoordinatorNode(Node):
         return result
 
     def go_to_location_callback(self, goal_handle):
-        """Go to location action server callback"""
+        """Handle go to location action server callback."""
         self.get_logger().info("Go to location goal received")
         goal_handle.succeed()
         result = GoToLocation.Result()
@@ -558,7 +559,7 @@ class ActionCoordinatorNode(Node):
         return result
 
     def emergency_response_callback(self, goal_handle):
-        """Emergency response action server callback"""
+        """Handle emergency response action server callback."""
         self.get_logger().critical("Emergency response goal received")
         goal_handle.succeed()
         result = EmergencyResponse.Result()
@@ -566,7 +567,7 @@ class ActionCoordinatorNode(Node):
         return result
 
     def execute_action_callback(self, request, response):
-        """Service callback for action execution"""
+        """Handle service callback for action execution."""
         try:
             self.get_logger().info(f"Execute action service called: {request.validated_intent.intent_type}")
             
@@ -584,7 +585,7 @@ class ActionCoordinatorNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

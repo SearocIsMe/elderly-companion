@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Launch file for the Elderly Companion Robdog Audio Processing Pipeline
-Coordinates VAD, ASR, and Emotion Analysis nodes
+Launch file for the Elderly Companion Robdog Audio Processing Pipeline.
+
+Coordinates VAD, ASR, and Emotion Analysis nodes.
 """
 
 from launch import LaunchDescription
@@ -12,7 +13,7 @@ from launch.conditions import IfCondition
 
 
 def generate_launch_description():
-    """Generate launch description for audio processing pipeline"""
+    """Generate launch description for audio processing pipeline."""
     
     # Declare launch arguments
     declare_use_rknpu = DeclareLaunchArgument(

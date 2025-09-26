@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Safety Guard Node for Elderly Companion Robdog
-Critical safety system that validates all intents and enforces safety constraints
-Ensures elderly safety through intent validation, emergency detection, and safety monitoring
+Safety Guard Node for Elderly Companion Robdog.
+
+Critical safety system that validates all intents and enforces safety constraints.
+Ensures elderly safety through intent validation, emergency detection, and safety monitoring.
 """
 
 import rclpy
@@ -28,7 +29,7 @@ from elderly_companion.srv import ValidateIntent, EmergencyDispatch
 
 
 class SafetyLevel(Enum):
-    """Safety levels for different situations"""
+    """Safety levels for different situations."""
     CRITICAL = 4  # Immediate emergency response required
     HIGH = 3     # High caution, restricted actions
     MEDIUM = 2   # Normal caution, some restrictions
@@ -37,7 +38,7 @@ class SafetyLevel(Enum):
 
 
 class EmergencyType(Enum):
-    """Types of emergency situations"""
+    """Types of emergency situations."""
     MEDICAL = "medical"
     FALL = "fall"
     SOS = "sos"
@@ -47,7 +48,7 @@ class EmergencyType(Enum):
 
 @dataclass
 class SafetyEvent:
-    """Safety event data structure"""
+    """Safety event data structure."""
     timestamp: datetime
     event_type: str
     severity: int
@@ -192,7 +193,7 @@ class SafetyGuardNode(Node):
         self.get_logger().info("Safety Guard Node initialized - Elderly safety protection active")
 
     def initialize_validation_rules(self) -> Dict[str, Dict[str, Any]]:
-        """Initialize intent validation rules"""
+        """Initialize intent validation rules."""
         return {
             'smart_home': {
                 'risk_level': 'low',
@@ -235,7 +236,7 @@ class SafetyGuardNode(Node):
         }
 
     def initialize_default_constraints(self):
-        """Initialize default safety constraints"""
+        """Initialize default safety constraints."""
         self.current_constraints.header = Header()
         self.current_constraints.header.stamp = self.get_clock().now().to_msg()
         self.current_constraints.header.frame_id = "safety_guard"
@@ -282,7 +283,7 @@ class SafetyGuardNode(Node):
         self.safety_constraints_pub.publish(self.current_constraints)
 
     def analyze_speech_safety_callback(self, msg: SpeechResult):
-        """Analyze speech for safety concerns and emergency detection"""
+        """Analyze speech for safety concerns and emergency detection."""
         try:
             text = msg.text.lower()
             emotion = msg.emotion
@@ -308,7 +309,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Speech safety analysis error: {e}")
 
     def detect_emergency_in_speech(self, text: str, emotion: EmotionData) -> Optional[str]:
-        """Detect emergency keywords and patterns in speech"""
+        """Detect emergency keywords and patterns in speech."""
         try:
             # Check critical emergency keywords
             for keyword in self.emergency_keywords['critical']:
@@ -343,7 +344,7 @@ class SafetyGuardNode(Node):
             return None
 
     def handle_speech_emergency(self, speech_msg: SpeechResult, emergency_type: str):
-        """Handle detected speech emergency"""
+        """Handle detected speech emergency."""
         try:
             self.get_logger().critical(f"EMERGENCY DETECTED: {emergency_type}")
             
@@ -388,7 +389,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Emergency handling error: {e}")
 
     def update_emergency_constraints(self):
-        """Update safety constraints for emergency situations"""
+        """Update safety constraints for emergency situations."""
         try:
             # Enable emergency override
             self.current_constraints.emergency_override_enabled = True
@@ -419,7 +420,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Emergency constraints update error: {e}")
 
     def monitor_health_indicators(self, text: str, emotion: EmotionData):
-        """Monitor health indicators from speech patterns"""
+        """Monitor health indicators from speech patterns."""
         try:
             health_concerns = []
             
@@ -458,7 +459,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Health monitoring error: {e}")
 
     def handle_high_stress(self, speech_msg: SpeechResult):
-        """Handle high stress situations"""
+        """Handle high stress situations."""
         try:
             stress_level = speech_msg.emotion.stress_level
             self.get_logger().warning(f"High stress detected: {stress_level:.2f}")
@@ -482,7 +483,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"High stress handling error: {e}")
 
     def update_elderly_status(self, speech_msg: SpeechResult):
-        """Update elderly person status based on speech"""
+        """Update elderly person status based on speech."""
         try:
             self.elderly_last_seen = datetime.now()
             self.elderly_responsive = True
@@ -494,7 +495,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Elderly status update error: {e}")
 
     def system_health_callback(self, msg: HealthStatus):
-        """Monitor system health status"""
+        """Monitor system health status."""
         try:
             self.system_health = msg
             self.last_system_update = datetime.now()
@@ -513,7 +514,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"System health callback error: {e}")
 
     def handle_low_battery_emergency(self, battery_level: float):
-        """Handle low battery emergency"""
+        """Handle low battery emergency."""
         try:
             self.get_logger().critical(f"CRITICAL: Low battery emergency - {battery_level:.1%}")
             
@@ -538,7 +539,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Low battery emergency handling error: {e}")
 
     def validate_intent_callback(self, request, response):
-        """Service callback for intent validation"""
+        """Handle service callback for intent validation."""
         try:
             intent = request.intent
             self.get_logger().info(f"Validating intent: {intent.intent_type}")
@@ -581,7 +582,7 @@ class SafetyGuardNode(Node):
             return response
 
     def evaluate_intent_safety(self, intent: IntentResult, rules: Dict[str, Any]) -> Dict[str, Any]:
-        """Evaluate intent safety based on current conditions"""
+        """Evaluate intent safety based on current conditions."""
         try:
             result = {
                 'approved': False,
@@ -632,7 +633,7 @@ class SafetyGuardNode(Node):
             }
 
     def validate_motion_intent(self, intent: IntentResult, result: Dict[str, Any]) -> bool:
-        """Validate motion-related intents"""
+        """Validate motion-related intents."""
         try:
             # Check if motion is currently restricted
             if 'motion' in self.current_constraints.disabled_features:
@@ -660,7 +661,7 @@ class SafetyGuardNode(Node):
             return False
 
     def validate_smart_home_intent(self, intent: IntentResult, result: Dict[str, Any]) -> bool:
-        """Validate smart home control intents"""
+        """Validate smart home control intents."""
         try:
             # Smart home actions are generally low risk
             # Check for system connectivity
@@ -676,7 +677,7 @@ class SafetyGuardNode(Node):
             return False
 
     def get_intent_priority(self, intent_type: str) -> int:
-        """Get priority level for intent type"""
+        """Get priority level for intent type."""
         priority_map = {
             'emergency': 4,
             'health_check': 3,
@@ -688,7 +689,7 @@ class SafetyGuardNode(Node):
         return priority_map.get(intent_type, 1)
 
     def emergency_dispatch_callback(self, request, response):
-        """Service callback for emergency dispatch"""
+        """Handle service callback for emergency dispatch."""
         try:
             self.get_logger().critical(f"Emergency dispatch requested: {request.emergency_type}")
             
@@ -716,7 +717,7 @@ class SafetyGuardNode(Node):
             return response
 
     def safety_monitoring_loop(self):
-        """Continuous safety monitoring loop"""
+        """Run continuous safety monitoring loop."""
         self.get_logger().info("Safety monitoring loop started")
         
         while rclpy.ok():
@@ -740,7 +741,7 @@ class SafetyGuardNode(Node):
                 time.sleep(5.0)  # Longer delay on error
 
     def check_elderly_wellness(self):
-        """Check elderly person wellness indicators"""
+        """Check elderly person wellness indicators."""
         try:
             now = datetime.now()
             
@@ -759,7 +760,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Elderly wellness check error: {e}")
 
     def check_system_wellness(self):
-        """Check system wellness indicators"""
+        """Check system wellness indicators."""
         try:
             now = datetime.now()
             
@@ -775,7 +776,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"System wellness check error: {e}")
 
     def update_dynamic_constraints(self):
-        """Update safety constraints based on current conditions"""
+        """Update safety constraints based on current conditions."""
         try:
             # Update timestamp
             self.current_constraints.header.stamp = self.get_clock().now().to_msg()
@@ -787,7 +788,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Dynamic constraints update error: {e}")
 
     def cleanup_old_events(self):
-        """Clean up old safety events"""
+        """Clean up old safety events."""
         try:
             cutoff_time = datetime.now() - timedelta(hours=24)
             self.safety_events = [
@@ -798,7 +799,7 @@ class SafetyGuardNode(Node):
             self.get_logger().error(f"Event cleanup error: {e}")
 
     def update_constraints_from_health(self, health_msg: HealthStatus):
-        """Update constraints based on system health"""
+        """Update constraints based on system health."""
         try:
             # Update based on battery level
             if health_msg.battery_level < 0.3:
@@ -818,7 +819,7 @@ class SafetyGuardNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Unitree Go2 Bridge Node for Elderly Companion Robdog
-Bridges ROS2 Action Agent with Unitree Go2 SDK
-Implements elderly-specific safety constraints and motion patterns
+Unitree Go2 Bridge Node for Elderly Companion Robdog.
+
+Bridges ROS2 Action Agent with Unitree Go2 SDK.
+Implements elderly-specific safety constraints and motion patterns.
 """
 
 import rclpy
@@ -44,7 +45,7 @@ from elderly_companion.msg import (
 
 
 class RobotState(Enum):
-    """Robot operational states"""
+    """Robot operational states."""
     STANDING = "standing"
     WALKING = "walking"
     SITTING = "sitting"
@@ -54,7 +55,7 @@ class RobotState(Enum):
 
 
 class GaitType(Enum):
-    """Gait types optimized for elderly companionship"""
+    """Gait types optimized for elderly companionship."""
     ELDERLY_WALK = "elderly_walk"      # Very gentle, slow gait
     NORMAL_WALK = "normal_walk"        # Standard walking gait
     CAREFUL_STEP = "careful_step"      # Extra careful stepping
@@ -63,7 +64,7 @@ class GaitType(Enum):
 
 @dataclass
 class ElderlyMotionConstraints:
-    """Motion constraints optimized for elderly safety"""
+    """Motion constraints optimized for elderly safety."""
     max_linear_velocity: float = 0.6      # m/s - elderly-safe speed
     max_angular_velocity: float = 0.8     # rad/s - gentle turning
     max_acceleration: float = 0.3         # m/s² - gentle acceleration
@@ -219,7 +220,7 @@ class UnitreeGo2BridgeNode(Node):
         self.get_logger().info("Unitree Go2 Bridge Node initialized - Elderly companion robot ready")
 
     def initialize_unitree_sdk(self):
-        """Initialize Unitree SDK connection"""
+        """Initialize Unitree SDK connection."""
         try:
             if not UNITREE_SDK_AVAILABLE:
                 self.get_logger().warning("Unitree SDK not available - using mock implementation")
@@ -256,7 +257,7 @@ class UnitreeGo2BridgeNode(Node):
             self.robot_ready = False
 
     def set_initial_robot_state(self):
-        """Set robot to initial safe state for elderly interaction"""
+        """Set robot to initial safe state for elderly interaction."""
         try:
             if not self.robot_ready or not self.sport_client:
                 return
@@ -281,7 +282,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Initial robot state setting error: {e}")
 
     def cmd_vel_callback(self, msg: Twist):
-        """Handle velocity commands with elderly safety constraints"""
+        """Handle velocity commands with elderly safety constraints."""
         try:
             if not self.robot_ready or self.emergency_stop_active:
                 return
@@ -300,7 +301,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Velocity command callback error: {e}")
 
     def apply_elderly_safety_constraints(self, cmd_vel: Twist) -> Twist:
-        """Apply elderly-specific safety constraints to velocity commands"""
+        """Apply elderly-specific safety constraints to velocity commands."""
         try:
             safe_cmd = Twist()
             
@@ -337,7 +338,7 @@ class UnitreeGo2BridgeNode(Node):
             return Twist()  # Return zero velocity on error
 
     def send_velocity_command(self, cmd_vel: Twist):
-        """Send velocity command to Unitree Go2"""
+        """Send velocity command to Unitree Go2."""
         try:
             if not self.sport_client:
                 return
@@ -362,7 +363,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Velocity command sending error: {e}")
 
     def safety_constraints_callback(self, msg: SafetyConstraints):
-        """Update safety constraints from safety guard"""
+        """Update safety constraints from safety guard."""
         try:
             self.current_safety_constraints = msg
             
@@ -382,7 +383,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Safety constraints update error: {e}")
 
     def emergency_alert_callback(self, msg: EmergencyAlert):
-        """Handle emergency alerts - implement emergency stop or response"""
+        """Handle emergency alerts - implement emergency stop or response."""
         try:
             self.get_logger().critical(f"EMERGENCY ALERT: {msg.emergency_type}")
             
@@ -397,7 +398,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Emergency alert handling error: {e}")
 
     def set_emergency_approach_mode(self):
-        """Set robot to emergency approach mode for assisting elderly"""
+        """Set robot to emergency approach mode for assisting elderly."""
         try:
             self.get_logger().critical("Setting emergency approach mode")
             
@@ -415,7 +416,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Emergency approach mode error: {e}")
 
     def emergency_stop(self):
-        """Emergency stop robot immediately"""
+        """Perform emergency stop of robot immediately."""
         try:
             self.get_logger().critical("EMERGENCY STOP ACTIVATED")
             
@@ -437,7 +438,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Emergency stop error: {e}")
 
     def start_monitoring_loops(self):
-        """Start robot monitoring and publishing loops"""
+        """Start robot monitoring and publishing loops."""
         try:
             # Create timers for monitoring
             self.state_pub_timer = self.create_timer(
@@ -459,7 +460,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Monitoring loops start error: {e}")
 
     def publish_robot_state(self):
-        """Publish robot state information to ROS2"""
+        """Publish robot state information to ROS2."""
         try:
             if not self.robot_ready:
                 return
@@ -484,7 +485,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Robot state publishing error: {e}")
 
     def publish_odometry(self, timestamp):
-        """Publish robot odometry"""
+        """Publish robot odometry."""
         try:
             odom_msg = Odometry()
             odom_msg.header.stamp = timestamp.to_msg()
@@ -512,7 +513,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Odometry publishing error: {e}")
 
     def publish_joint_states(self, timestamp):
-        """Publish robot joint states"""
+        """Publish robot joint states."""
         try:
             joint_msg = JointState()
             joint_msg.header.stamp = timestamp.to_msg()
@@ -537,7 +538,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Joint states publishing error: {e}")
 
     def publish_imu_data(self, timestamp):
-        """Publish robot IMU data"""
+        """Publish robot IMU data."""
         try:
             imu_msg = Imu()
             imu_msg.header.stamp = timestamp.to_msg()
@@ -552,7 +553,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"IMU data publishing error: {e}")
 
     def health_check_loop(self):
-        """Monitor robot health and publish status"""
+        """Monitor robot health and publish status."""
         try:
             health_msg = HealthStatus()
             health_msg.header.stamp = self.get_clock().now().to_msg()
@@ -583,7 +584,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Health check error: {e}")
 
     def check_command_timeout(self):
-        """Check for command timeout and stop robot if no recent commands"""
+        """Check for command timeout and stop robot if no recent commands."""
         try:
             current_time = datetime.now()
             time_since_last_cmd = (current_time - self.last_command_time).total_seconds()
@@ -599,7 +600,7 @@ class UnitreeGo2BridgeNode(Node):
             self.get_logger().error(f"Command timeout check error: {e}")
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'sport_client') and self.sport_client:
                 # Ensure robot stops safely
@@ -610,7 +611,7 @@ class UnitreeGo2BridgeNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

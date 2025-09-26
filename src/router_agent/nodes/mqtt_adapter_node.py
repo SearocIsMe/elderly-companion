@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-MQTT Adapter Node for Elderly Companion Robdog
-Handles smart home device integration via MQTT, Matter, and REST APIs
-Specialized for elderly-friendly device control and monitoring
+MQTT Adapter Node for Elderly Companion Robdog.
+
+Handles smart home device integration via MQTT, Matter, and REST APIs.
+Specialized for elderly-friendly device control and monitoring.
 """
 
 import rclpy
@@ -32,7 +33,7 @@ from elderly_companion.msg import IntentResult, HealthStatus, EmergencyAlert
 
 
 class DeviceType(Enum):
-    """Smart home device types"""
+    """Smart home device types."""
     LIGHT = "light"
     THERMOSTAT = "thermostat"
     SECURITY_CAMERA = "camera"
@@ -46,7 +47,7 @@ class DeviceType(Enum):
 
 
 class DeviceProtocol(Enum):
-    """Device communication protocols"""
+    """Device communication protocols."""
     MQTT = "mqtt"
     MATTER = "matter"
     REST_API = "rest"
@@ -56,7 +57,7 @@ class DeviceProtocol(Enum):
 
 @dataclass
 class SmartDevice:
-    """Smart home device representation"""
+    """Smart home device representation."""
     device_id: str
     name: str
     device_type: DeviceType
@@ -72,7 +73,7 @@ class SmartDevice:
 
 @dataclass
 class DeviceCommand:
-    """Device command structure"""
+    """Device command structure."""
     device_id: str
     action: str
     parameters: Dict[str, Any]
@@ -233,7 +234,7 @@ class MQTTAdapterNode(Node):
         self.get_logger().info("MQTT Adapter Node initialized - Smart home integration ready")
 
     def create_http_session(self) -> requests.Session:
-        """Create HTTP session with retry strategy"""
+        """Create HTTP session with retry strategy."""
         session = requests.Session()
         
         retry_strategy = Retry(
@@ -249,7 +250,7 @@ class MQTTAdapterNode(Node):
         return session
 
     def initialize_mqtt_client(self):
-        """Initialize MQTT client connection"""
+        """Initialize MQTT client connection."""
         try:
             self.mqtt_client = mqtt.Client(
                 client_id=self.get_parameter('mqtt.client_id').value,
@@ -284,7 +285,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"MQTT client initialization failed: {e}")
 
     def on_mqtt_connect(self, client, userdata, flags, rc):
-        """MQTT connection callback"""
+        """Handle MQTT connection callback."""
         if rc == 0:
             self.mqtt_connected = True
             self.get_logger().info("Connected to MQTT broker successfully")
@@ -296,7 +297,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"MQTT connection failed with code {rc}")
 
     def on_mqtt_disconnect(self, client, userdata, rc):
-        """MQTT disconnection callback"""
+        """Handle MQTT disconnection callback."""
         self.mqtt_connected = False
         if rc != 0:
             self.get_logger().warning("Unexpected MQTT disconnection")
@@ -304,7 +305,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().info("MQTT disconnected")
 
     def on_mqtt_message(self, client, userdata, msg):
-        """MQTT message callback"""
+        """Handle MQTT message callback."""
         try:
             topic = msg.topic
             payload = msg.payload.decode('utf-8')
@@ -318,11 +319,11 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"MQTT message processing error: {e}")
 
     def on_mqtt_publish(self, client, userdata, mid):
-        """MQTT publish callback"""
+        """Handle MQTT publish callback."""
         self.get_logger().debug(f"MQTT message published: {mid}")
 
     def subscribe_to_device_topics(self):
-        """Subscribe to device status topics"""
+        """Subscribe to device status topics."""
         try:
             # Subscribe to common device discovery topics
             discovery_topics = [
@@ -341,7 +342,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device topic subscription error: {e}")
 
     def start_device_discovery(self):
-        """Start device discovery process"""
+        """Start device discovery process."""
         try:
             self.get_logger().info("Starting smart home device discovery...")
             
@@ -359,7 +360,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device discovery error: {e}")
 
     def discover_homeassistant_devices(self):
-        """Discover devices from Home Assistant"""
+        """Discover devices from Home Assistant."""
         try:
             if not self.ha_url or not self.ha_token:
                 return
@@ -390,7 +391,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Home Assistant device discovery error: {e}")
 
     def discover_mqtt_devices(self):
-        """Discover devices through MQTT"""
+        """Discover devices through MQTT."""
         try:
             # Send discovery requests
             discovery_requests = [
@@ -407,7 +408,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"MQTT device discovery error: {e}")
 
     def initialize_default_devices(self):
-        """Initialize default devices for elderly home"""
+        """Initialize default devices for elderly home."""
         try:
             default_devices = [
                 # Living room devices
@@ -464,7 +465,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Default device initialization error: {e}")
 
     def handle_smart_home_intent_callback(self, msg: IntentResult):
-        """Handle validated smart home intents"""
+        """Handle validated smart home intents."""
         try:
             if msg.intent_type != 'smart_home':
                 return
@@ -485,7 +486,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Smart home intent handling error: {e}")
 
     def extract_device_command_from_intent(self, intent: IntentResult) -> Optional[DeviceCommand]:
-        """Extract device command from intent parameters"""
+        """Extract device command from intent parameters."""
         try:
             # Create parameter dictionary
             params = {}
@@ -519,7 +520,7 @@ class MQTTAdapterNode(Node):
             return None
 
     def parse_device_command_from_context(self, intent: IntentResult) -> Tuple[str, str]:
-        """Parse device command from conversation context"""
+        """Parse device command from conversation context."""
         try:
             # This would integrate with the dialog manager to get the original speech text
             # For now, we'll use a simple approach based on common patterns
@@ -545,7 +546,7 @@ class MQTTAdapterNode(Node):
             return "", ""
 
     def execute_device_command(self, command: DeviceCommand):
-        """Execute device command"""
+        """Execute device command."""
         try:
             self.get_logger().info(f"Executing command: {command.action} on {command.device_id}")
             
@@ -575,7 +576,7 @@ class MQTTAdapterNode(Node):
             self.publish_command_result("error", str(e))
 
     def execute_mqtt_command(self, device: SmartDevice, command: DeviceCommand):
-        """Execute MQTT device command"""
+        """Execute MQTT device command."""
         try:
             if not self.mqtt_connected:
                 raise Exception("MQTT not connected")
@@ -598,7 +599,7 @@ class MQTTAdapterNode(Node):
             self.publish_command_result("error", str(e))
 
     def prepare_mqtt_payload(self, device: SmartDevice, command: DeviceCommand) -> Dict[str, Any]:
-        """Prepare MQTT payload for device command"""
+        """Prepare MQTT payload for device command."""
         try:
             base_payload = {
                 "device_id": device.device_id,
@@ -631,7 +632,7 @@ class MQTTAdapterNode(Node):
             return {"error": str(e)}
 
     def execute_rest_command(self, device: SmartDevice, command: DeviceCommand):
-        """Execute REST API device command"""
+        """Execute REST API device command."""
         try:
             if not device.rest_endpoint:
                 raise Exception("No REST endpoint configured for device")
@@ -664,7 +665,7 @@ class MQTTAdapterNode(Node):
             self.publish_command_result("error", str(e))
 
     def prepare_rest_payload(self, device: SmartDevice, command: DeviceCommand) -> Dict[str, Any]:
-        """Prepare REST API payload for device command"""
+        """Prepare REST API payload for device command."""
         try:
             # Home Assistant format
             if 'homeassistant' in (device.rest_endpoint or ''):
@@ -687,7 +688,7 @@ class MQTTAdapterNode(Node):
             return {"error": str(e)}
 
     def handle_emergency_alert_callback(self, msg: EmergencyAlert):
-        """Handle emergency alerts with device coordination"""
+        """Handle emergency alerts with device coordination."""
         try:
             self.get_logger().critical(f"Emergency alert - coordinating devices: {msg.emergency_type}")
             
@@ -701,7 +702,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Emergency device coordination error: {e}")
 
     def generate_emergency_device_commands(self, alert: EmergencyAlert) -> List[DeviceCommand]:
-        """Generate device commands for emergency situations"""
+        """Generate device commands for emergency situations."""
         commands = []
         
         try:
@@ -752,7 +753,7 @@ class MQTTAdapterNode(Node):
             return []
 
     def process_device_status_update(self, topic: str, payload: str):
-        """Process device status updates from MQTT"""
+        """Process device status updates from MQTT."""
         try:
             # Parse payload
             try:
@@ -775,7 +776,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device status update processing error: {e}")
 
     def extract_device_id_from_topic(self, topic: str) -> Optional[str]:
-        """Extract device ID from MQTT topic"""
+        """Extract device ID from MQTT topic."""
         try:
             # Handle different topic patterns
             if "elderly_companion/devices/" in topic:
@@ -791,7 +792,7 @@ class MQTTAdapterNode(Node):
             return None
 
     def create_device_from_ha_info(self, device_info: Dict[str, Any]) -> Optional[SmartDevice]:
-        """Create SmartDevice from Home Assistant device info"""
+        """Create SmartDevice from Home Assistant device info."""
         try:
             device_id = device_info.get('id', '')
             name = device_info.get('name', '')
@@ -819,7 +820,7 @@ class MQTTAdapterNode(Node):
             return None
 
     def determine_device_type_from_ha(self, device_info: Dict[str, Any]) -> DeviceType:
-        """Determine device type from Home Assistant device info"""
+        """Determine device type from Home Assistant device info."""
         name = device_info.get('name', '').lower()
         model = device_info.get('model', '').lower()
         
@@ -835,12 +836,12 @@ class MQTTAdapterNode(Node):
             return DeviceType.LIGHT  # Default
 
     def get_ha_device_capabilities(self, device_info: Dict[str, Any]) -> List[str]:
-        """Get device capabilities from Home Assistant device info"""
+        """Get device capabilities from Home Assistant device info."""
         # This would be expanded based on actual HA device information
         return ["turn_on", "turn_off", "toggle"]
 
     def publish_device_status(self, device: SmartDevice):
-        """Publish device status update"""
+        """Publish device status update."""
         try:
             status_data = {
                 "device_id": device.device_id,
@@ -858,7 +859,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device status publishing error: {e}")
 
     def publish_command_result(self, status: str, message: str):
-        """Publish command execution result"""
+        """Publish command execution result."""
         try:
             result_data = {
                 "status": status,
@@ -874,7 +875,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Command result publishing error: {e}")
 
     def publish_discovered_devices(self):
-        """Publish list of discovered devices"""
+        """Publish list of discovered devices."""
         try:
             devices_data = {
                 "devices": [
@@ -903,7 +904,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device discovery publishing error: {e}")
 
     def refresh_device_states(self):
-        """Refresh all device states"""
+        """Refresh all device states."""
         try:
             self.get_logger().debug("Refreshing device states...")
             
@@ -917,7 +918,7 @@ class MQTTAdapterNode(Node):
             self.get_logger().error(f"Device state refresh error: {e}")
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'mqtt_client') and self.mqtt_client:
                 self.mqtt_client.loop_stop()
@@ -927,7 +928,7 @@ class MQTTAdapterNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

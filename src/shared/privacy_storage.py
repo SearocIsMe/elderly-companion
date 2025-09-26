@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Privacy Storage System for Elderly Companion Robdog
-Encrypted local storage for elderly conversation data, emotions, and memories
-Implements Privacy-by-Design and GDPR compliance
+Privacy Storage System for Elderly Companion Robdog.
+
+Encrypted local storage for elderly conversation data, emotions, and memories.
+Implements Privacy-by-Design and GDPR compliance.
 """
 
 import rclpy
@@ -42,7 +43,7 @@ from elderly_companion.msg import SpeechResult, EmotionData, IntentResult
 
 
 class DataCategory(Enum):
-    """Categories of elderly data"""
+    """Categories of elderly data."""
     CONVERSATION = "conversation"
     EMOTION = "emotion"
     HEALTH_INDICATOR = "health_indicator"
@@ -52,7 +53,7 @@ class DataCategory(Enum):
 
 
 class PrivacyLevel(Enum):
-    """Privacy levels for data"""
+    """Privacy levels for data."""
     PUBLIC = 1        # Can be shared openly
     INTERNAL = 2      # Only within robot system
     FAMILY = 3        # Can be shared with family
@@ -61,7 +62,7 @@ class PrivacyLevel(Enum):
 
 
 class RetentionPolicy(Enum):
-    """Data retention policies"""
+    """Data retention policies."""
     SHORT_TERM = 7        # 7 days
     MEDIUM_TERM = 30      # 30 days
     LONG_TERM = 365       # 1 year
@@ -70,7 +71,7 @@ class RetentionPolicy(Enum):
 
 @dataclass
 class DataRecord:
-    """Encrypted data record"""
+    """Encrypted data record."""
     record_id: str
     category: DataCategory
     privacy_level: PrivacyLevel
@@ -86,7 +87,7 @@ class DataRecord:
 
 @dataclass
 class ConversationRecord:
-    """Conversation data structure"""
+    """Conversation data structure."""
     conversation_id: str
     timestamp: datetime
     speech_text: str
@@ -99,7 +100,7 @@ class ConversationRecord:
 
 @dataclass
 class MemoryTag:
-    """Memory tag for UC6 - Memory Bank"""
+    """Memory tag for UC6 - Memory Bank."""
     tag_id: str
     tag_text: str
     category: str  # person, place, object, activity, emotion
@@ -220,7 +221,7 @@ class PrivacyStorageNode(Node):
         self.get_logger().info("Privacy Storage Node initialized - Secure elderly data storage ready")
 
     def initialize_storage_system(self):
-        """Initialize encrypted storage system"""
+        """Initialize encrypted storage system."""
         try:
             # Create storage directory
             os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
@@ -240,7 +241,7 @@ class PrivacyStorageNode(Node):
             raise
 
     def initialize_encryption(self):
-        """Initialize encryption system"""
+        """Initialize encryption system."""
         try:
             if not CRYPTO_AVAILABLE:
                 self.get_logger().warning("Cryptography not available - data will not be encrypted")
@@ -269,7 +270,7 @@ class PrivacyStorageNode(Node):
             raise
 
     def initialize_database(self):
-        """Initialize SQLite database with privacy schema"""
+        """Initialize SQLite database with privacy schema."""
         try:
             self.db_connection = sqlite3.connect(
                 self.db_path,
@@ -292,7 +293,7 @@ class PrivacyStorageNode(Node):
             raise
 
     def create_database_schema(self):
-        """Create database schema for privacy-compliant storage"""
+        """Create database schema for privacy-compliant storage."""
         try:
             cursor = self.db_connection.cursor()
             
@@ -387,7 +388,7 @@ class PrivacyStorageNode(Node):
             raise
 
     def store_speech_data_callback(self, msg: SpeechResult):
-        """Store speech data with privacy compliance"""
+        """Store speech data with privacy compliance."""
         try:
             # Check consent for conversation storage
             if not self.check_consent(DataCategory.CONVERSATION):
@@ -424,7 +425,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Speech data storage error: {e}")
 
     def store_conversation(self, conversation: ConversationRecord):
-        """Store conversation with encryption"""
+        """Store conversation with encryption."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -469,7 +470,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Conversation storage error: {e}")
 
     def store_memory_tag(self, tag: MemoryTag):
-        """Store memory tag for UC6 - Memory Bank"""
+        """Store memory tag for UC6 - Memory Bank."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -523,7 +524,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Memory tag storage error: {e}")
 
     def store_emotion_data(self, emotion: EmotionData, conversation_id: str):
-        """Store emotion data with privacy protection"""
+        """Store emotion data with privacy protection."""
         try:
             emotion_record = {
                 'conversation_id': conversation_id,
@@ -557,7 +558,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Emotion data storage error: {e}")
 
     def encrypt_data(self, data: str) -> bytes:
-        """Encrypt data using Fernet encryption"""
+        """Encrypt data using Fernet encryption."""
         try:
             if not self.encryption_enabled or not self.fernet:
                 return data.encode('utf-8')
@@ -569,7 +570,7 @@ class PrivacyStorageNode(Node):
             return data.encode('utf-8')
 
     def decrypt_data(self, encrypted_data: bytes) -> str:
-        """Decrypt data using Fernet encryption"""
+        """Decrypt data using Fernet encryption."""
         try:
             if not self.encryption_enabled or not self.fernet:
                 return encrypted_data.decode('utf-8')
@@ -581,7 +582,7 @@ class PrivacyStorageNode(Node):
             return ""
 
     def store_data_record(self, record: DataRecord):
-        """Store encrypted data record"""
+        """Store encrypted data record."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -612,7 +613,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Data record storage error: {e}")
 
     def check_consent(self, category: DataCategory) -> bool:
-        """Check if consent is given for data category"""
+        """Check if consent is given for data category."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -631,7 +632,7 @@ class PrivacyStorageNode(Node):
             return False  # Default to no consent on error
 
     def log_data_access(self, record_id: str, accessed_by: str, access_type: str, purpose: str):
-        """Log data access for audit trail"""
+        """Log data access for audit trail."""
         try:
             if not self.access_logging_enabled:
                 return
@@ -658,7 +659,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Access logging error: {e}")
 
     def cleanup_expired_data(self):
-        """Clean up expired data based on retention policies"""
+        """Clean up expired data based on retention policies."""
         try:
             self.get_logger().info("Starting privacy-compliant data cleanup...")
             
@@ -692,7 +693,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Data cleanup error: {e}")
 
     def secure_delete_record(self, record_id: str):
-        """Securely delete data record"""
+        """Securely delete data record."""
         try:
             cursor = self.db_connection.cursor()
             
@@ -710,7 +711,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Secure deletion error: {e}")
 
     def serialize_emotion_data(self, emotion: EmotionData) -> Dict[str, Any]:
-        """Serialize emotion data for storage"""
+        """Serialize emotion data for storage."""
         return {
             'primary_emotion': emotion.primary_emotion,
             'confidence': emotion.confidence,
@@ -725,7 +726,7 @@ class PrivacyStorageNode(Node):
         }
 
     def publish_memory_tags(self):
-        """Publish current memory tags for UC6"""
+        """Publish current memory tags for UC6."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -761,7 +762,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Memory tags publishing error: {e}")
 
     def get_conversation_history(self, days: int = 7, privacy_level: Optional[PrivacyLevel] = None) -> List[Dict[str, Any]]:
-        """Get conversation history with privacy filtering"""
+        """Get conversation history with privacy filtering."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -804,7 +805,7 @@ class PrivacyStorageNode(Node):
             return []
 
     def anonymize_old_data(self):
-        """Anonymize old data for privacy compliance"""
+        """Anonymize old data for privacy compliance."""
         try:
             with self.db_lock:
                 cursor = self.db_connection.cursor()
@@ -837,7 +838,7 @@ class PrivacyStorageNode(Node):
             self.get_logger().error(f"Data anonymization error: {e}")
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'db_connection') and self.db_connection:
                 self.db_connection.close()
@@ -846,7 +847,7 @@ class PrivacyStorageNode(Node):
 
 
 class MemoryTagger:
-    """Memory tagger for UC6 - Memory Bank"""
+    """Memory tagger for UC6 - Memory Bank."""
     
     def __init__(self):
         # Elderly-specific memory categories
@@ -859,7 +860,7 @@ class MemoryTagger:
         }
     
     def extract_memory_tags(self, text: str, emotion: EmotionData) -> List[MemoryTag]:
-        """Extract memory tags from conversation"""
+        """Extract memory tags from conversation."""
         tags = []
         
         try:
@@ -889,10 +890,10 @@ class MemoryTagger:
 
 
 class ConversationAnalyzer:
-    """Conversation analyzer for emotional patterns"""
+    """Conversation analyzer for emotional patterns."""
     
     def analyze_conversation_patterns(self, conversations: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze conversation patterns for UC5 emotional support"""
+        """Analyze conversation patterns for UC5 emotional support."""
         try:
             # Analyze emotional trends, conversation frequency, topics
             patterns = {
@@ -909,7 +910,7 @@ class ConversationAnalyzer:
             return {}
     
     def analyze_emotional_trends(self, conversations: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze emotional trends over time"""
+        """Analyze emotional trends over time."""
         emotions_by_day = {}
         
         for conv in conversations:
@@ -923,7 +924,7 @@ class ConversationAnalyzer:
         return emotions_by_day
     
     def analyze_conversation_frequency(self, conversations: List[Dict[str, Any]]) -> Dict[str, int]:
-        """Analyze conversation frequency patterns"""
+        """Analyze conversation frequency patterns."""
         frequency_by_hour = {}
         
         for conv in conversations:
@@ -933,7 +934,7 @@ class ConversationAnalyzer:
         return frequency_by_hour
     
     def analyze_common_topics(self, conversations: List[Dict[str, Any]]) -> List[str]:
-        """Analyze common conversation topics"""
+        """Analyze common conversation topics."""
         all_tags = []
         
         for conv in conversations:
@@ -949,7 +950,7 @@ class ConversationAnalyzer:
         return sorted(tag_counts.keys(), key=lambda x: tag_counts[x], reverse=True)[:10]
     
     def analyze_health_indicators(self, conversations: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analyze health indicators from conversations"""
+        """Analyze health indicators from conversations."""
         health_keywords = {
             'pain': ['疼', '痛', 'pain', 'hurt'],
             'confusion': ['忘记', '糊涂', 'forget', 'confused'],
@@ -971,7 +972,7 @@ class ConversationAnalyzer:
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

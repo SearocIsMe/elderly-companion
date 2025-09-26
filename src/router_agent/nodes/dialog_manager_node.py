@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Dialog Manager Node for Elderly Companion Robdog
-Manages conversation flow, context, and generates appropriate responses
-Specialized for elderly communication patterns and needs
+Dialog Manager Node for Elderly Companion Robdog.
+
+Manages conversation flow, context, and generates appropriate responses.
+Specialized for elderly communication patterns and needs.
 """
 
 import rclpy
@@ -28,7 +29,7 @@ from elderly_companion.srv import ValidateIntent
 
 
 class ConversationState(Enum):
-    """Conversation states"""
+    """Conversation states."""
     IDLE = "idle"
     LISTENING = "listening"
     PROCESSING = "processing"
@@ -38,7 +39,7 @@ class ConversationState(Enum):
 
 
 class ResponseType(Enum):
-    """Types of responses"""
+    """Types of responses."""
     ACKNOWLEDGMENT = "acknowledgment"
     QUESTION = "question"
     INFORMATION = "information"
@@ -50,7 +51,7 @@ class ResponseType(Enum):
 
 @dataclass
 class ConversationContext:
-    """Conversation context data"""
+    """Conversation context data."""
     conversation_id: str
     start_time: datetime
     last_interaction: datetime
@@ -65,7 +66,7 @@ class ConversationContext:
 
 @dataclass
 class ResponseTemplate:
-    """Response template structure"""
+    """Response template structure."""
     template_id: str
     category: str
     templates: List[str]
@@ -188,7 +189,7 @@ class DialogManagerNode(Node):
         self.get_logger().info("Dialog Manager Node initialized - Ready for elderly conversation")
 
     def initialize_response_templates(self) -> Dict[str, ResponseTemplate]:
-        """Initialize response templates for different situations"""
+        """Initialize response templates for different situations."""
         templates = {}
         
         # Greeting templates
@@ -305,7 +306,7 @@ class DialogManagerNode(Node):
         return templates
 
     def initialize_elderly_patterns(self) -> Dict[str, Any]:
-        """Initialize elderly-specific communication patterns"""
+        """Initialize elderly-specific communication patterns."""
         return {
             'response_timing': {
                 'slow': 2.0,      # Slower responses for processing
@@ -331,7 +332,7 @@ class DialogManagerNode(Node):
         }
 
     def process_speech_input_callback(self, msg: SpeechResult):
-        """Process incoming speech with emotion analysis"""
+        """Process incoming speech with emotion analysis."""
         try:
             self.get_logger().info(f"Processing speech input: '{msg.text}'")
             
@@ -359,7 +360,7 @@ class DialogManagerNode(Node):
             self.generate_error_response("Sorry, I didn't understand that clearly.")
 
     def start_new_conversation(self, speech_msg: SpeechResult):
-        """Start a new conversation session"""
+        """Start a new conversation session."""
         try:
             self.current_conversation_id = f"conv_{int(time.time())}"
             
@@ -387,7 +388,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"New conversation start error: {e}")
 
     def update_conversation_context(self, speech_msg: SpeechResult):
-        """Update existing conversation context"""
+        """Update existing conversation context."""
         try:
             if self.current_conversation_id in self.active_conversations:
                 context = self.active_conversations[self.current_conversation_id]
@@ -403,7 +404,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Conversation context update error: {e}")
 
     def classify_intent_from_speech(self, speech_msg: SpeechResult) -> Optional[IntentResult]:
-        """Classify intent from speech content"""
+        """Classify intent from speech content."""
         try:
             text = speech_msg.text.lower()
             emotion = speech_msg.emotion
@@ -455,7 +456,7 @@ class DialogManagerNode(Node):
             return None
 
     def request_intent_validation(self, intent: IntentResult):
-        """Request intent validation from safety guard"""
+        """Request intent validation from safety guard."""
         try:
             if not self.safety_validation_client.service_is_ready():
                 self.get_logger().warning("Safety validation service not ready")
@@ -480,7 +481,7 @@ class DialogManagerNode(Node):
             self.generate_error_response("Sorry, I need to check if that's safe first.")
 
     def handle_validation_response(self, future, original_intent: IntentResult):
-        """Handle validation response from safety guard"""
+        """Handle validation response from safety guard."""
         try:
             response = future.result()
             
@@ -496,7 +497,7 @@ class DialogManagerNode(Node):
             self.generate_error_response("Sorry, there was a safety check problem.")
 
     def process_validated_intent_callback(self, msg: IntentResult):
-        """Process validated intent and generate appropriate response"""
+        """Process validated intent and generate appropriate response."""
         try:
             self.get_logger().info(f"Processing validated intent: {msg.intent_type}")
             
@@ -524,7 +525,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Validated intent processing error: {e}")
 
     def process_validated_intent(self, intent: IntentResult, validation_response):
-        """Process intent that has been validated by safety guard"""
+        """Process intent that has been validated by safety guard."""
         try:
             # Set response timing based on elderly preferences
             response_delay = self.elderly_patterns['response_timing'][self.communication_style]
@@ -536,7 +537,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Validated intent processing error: {e}")
 
     def execute_validated_intent(self, intent: IntentResult, validation_response):
-        """Execute the validated intent with appropriate response"""
+        """Execute the validated intent with appropriate response."""
         try:
             if intent.intent_type == 'smart_home':
                 self.execute_smart_home_action(intent)
@@ -553,7 +554,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Intent execution error: {e}")
 
     def handle_emergency_intent(self, intent: IntentResult):
-        """Handle emergency intent with immediate response"""
+        """Handle emergency intent with immediate response."""
         try:
             self.emergency_active = True
             self.set_conversation_state(ConversationState.EMERGENCY)
@@ -570,7 +571,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Emergency intent handling error: {e}")
 
     def execute_smart_home_action(self, intent: IntentResult):
-        """Execute smart home control action"""
+        """Execute smart home control action."""
         try:
             # Extract parameters
             device = "device"
@@ -591,7 +592,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Smart home action execution error: {e}")
 
     def execute_follow_action(self, intent: IntentResult):
-        """Execute follow action with safety confirmation"""
+        """Execute follow action with safety confirmation."""
         try:
             if intent.requires_confirmation:
                 self.set_conversation_state(ConversationState.WAITING_CONFIRMATION)
@@ -605,7 +606,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Follow action execution error: {e}")
 
     def execute_chat_response(self, intent: IntentResult):
-        """Execute chat response with emotional consideration"""
+        """Execute chat response with emotional consideration."""
         try:
             emotion = intent.emotional_context
             
@@ -624,7 +625,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Chat response execution error: {e}")
 
     def execute_memory_action(self, intent: IntentResult):
-        """Execute memory-related action"""
+        """Execute memory-related action."""
         try:
             response = "我会记住这个信息。还有什么想让我记住的吗？"
             self.send_response(response, ResponseType.INFORMATION)
@@ -633,7 +634,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Memory action execution error: {e}")
 
     def generate_conversational_response(self, speech_msg: SpeechResult):
-        """Generate conversational response without specific intent"""
+        """Generate conversational response without specific intent."""
         try:
             emotion = speech_msg.emotion
             
@@ -652,7 +653,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Conversational response generation error: {e}")
 
     def select_appropriate_template(self, templates: List[str], emotion: EmotionData) -> str:
-        """Select appropriate template based on context and emotion"""
+        """Select appropriate template based on context and emotion."""
         try:
             # Filter templates by language preference
             if self.preferred_language == 'zh-CN':
@@ -672,7 +673,7 @@ class DialogManagerNode(Node):
             return "I understand."
 
     def send_response(self, response_text: str, response_type: ResponseType):
-        """Send response through multiple channels"""
+        """Send response through multiple channels."""
         try:
             # Log the response
             self.get_logger().info(f"Sending response ({response_type.value}): {response_text}")
@@ -701,7 +702,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Response sending error: {e}")
 
     def generate_rejection_response(self, intent: IntentResult, validation_response):
-        """Generate response for rejected intent"""
+        """Generate response for rejected intent."""
         try:
             reason = validation_response.rejection_reason
             alternatives = validation_response.alternative_suggestions
@@ -717,7 +718,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Rejection response generation error: {e}")
 
     def generate_error_response(self, error_message: str):
-        """Generate error response"""
+        """Generate error response."""
         try:
             response = f"抱歉，{error_message}，请再说一遍好吗？"
             self.send_response(response, ResponseType.ERROR)
@@ -726,7 +727,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Error response generation error: {e}")
 
     def generate_default_response(self, intent: IntentResult):
-        """Generate default response for unhandled intents"""
+        """Generate default response for unhandled intents."""
         try:
             response = "我明白了，让我想想怎么帮助您。"
             self.send_response(response, ResponseType.ACKNOWLEDGMENT)
@@ -735,7 +736,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Default response generation error: {e}")
 
     def handle_emergency_callback(self, msg: EmergencyAlert):
-        """Handle emergency alert from safety system"""
+        """Handle emergency alert from safety system."""
         try:
             self.emergency_active = True
             self.set_conversation_state(ConversationState.EMERGENCY)
@@ -756,7 +757,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Emergency callback handling error: {e}")
 
     def set_conversation_state(self, state: ConversationState):
-        """Set and publish conversation state"""
+        """Set and publish conversation state."""
         try:
             self.current_state = state
             
@@ -768,7 +769,7 @@ class DialogManagerNode(Node):
             self.get_logger().error(f"Conversation state setting error: {e}")
 
     def cleanup_old_conversations(self):
-        """Clean up old conversation contexts"""
+        """Clean up old conversation contexts."""
         try:
             cutoff_time = datetime.now() - timedelta(minutes=self.context_timeout)
             
@@ -792,7 +793,7 @@ class DialogManagerNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

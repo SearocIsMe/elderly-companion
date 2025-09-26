@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Audio Processor Node for Elderly Companion Robdog
-Coordinates the audio processing pipeline: VAD -> ASR -> Emotion Detection -> Intent Classification
+Audio Processor Node for Elderly Companion Robdog.
+
+Coordinates the audio processing pipeline: VAD -> ASR -> Emotion Detection -> Intent Classification.
 """
 
 import rclpy
@@ -30,6 +31,7 @@ from elderly_companion.srv import ProcessSpeech
 class AudioProcessorNode(Node):
     """
     Main audio processing node for the elderly companion robot.
+    
     Handles continuous audio capture, VAD, and coordinates downstream processing.
     """
 
@@ -106,7 +108,7 @@ class AudioProcessorNode(Node):
         self.get_logger().info("Audio Processor Node initialized successfully")
 
     def start_audio_stream(self):
-        """Initialize and start the audio input stream"""
+        """Initialize and start the audio input stream."""
         try:
             # Query available audio devices
             devices = sd.query_devices()
@@ -133,7 +135,7 @@ class AudioProcessorNode(Node):
             raise
 
     def audio_callback(self, indata: np.ndarray, frames: int, time_info, status):
-        """Callback for audio stream - called for each audio chunk"""
+        """Handle callback for audio stream - called for each audio chunk."""
         if status:
             self.get_logger().warning(f"Audio stream status: {status}")
         
@@ -159,7 +161,7 @@ class AudioProcessorNode(Node):
             self.get_logger().error(f"Error in audio callback: {e}")
 
     def publish_raw_audio(self, audio_data: np.ndarray, timestamp):
-        """Publish raw audio data"""
+        """Publish raw audio data."""
         try:
             audio_msg = Audio()
             audio_msg.header = Header()
@@ -175,7 +177,7 @@ class AudioProcessorNode(Node):
             self.get_logger().error(f"Failed to publish raw audio: {e}")
 
     def audio_processing_loop(self):
-        """Main audio processing loop running in separate thread"""
+        """Run main audio processing loop in separate thread."""
         self.get_logger().info("Audio processing loop started")
         
         while rclpy.ok():
@@ -192,7 +194,7 @@ class AudioProcessorNode(Node):
                 self.get_logger().error(f"Error in audio processing loop: {e}")
 
     def process_vad(self, audio_data: Dict[str, Any]):
-        """Process audio chunk with Voice Activity Detection"""
+        """Process audio chunk with Voice Activity Detection."""
         try:
             audio_chunk = audio_data['data']
             timestamp = audio_data['timestamp']
@@ -224,7 +226,7 @@ class AudioProcessorNode(Node):
             self.get_logger().error(f"VAD processing error: {e}")
 
     def process_complete_speech(self):
-        """Process complete speech segment"""
+        """Process complete speech segment."""
         try:
             if not self.current_speech_buffer:
                 return
@@ -256,7 +258,7 @@ class AudioProcessorNode(Node):
             self.current_speech_buffer = []
 
     def call_speech_recognition_service(self, audio_msg: Audio):
-        """Call the speech recognition service"""
+        """Call the speech recognition service."""
         try:
             # This will be connected to the speech recognition node
             # For now, we'll create a placeholder result
@@ -266,7 +268,7 @@ class AudioProcessorNode(Node):
             self.get_logger().error(f"Speech recognition service call failed: {e}")
 
     def create_placeholder_speech_result(self, audio_msg: Audio):
-        """Create a placeholder speech result for testing"""
+        """Create a placeholder speech result for testing."""
         try:
             # Create basic speech result
             speech_result = SpeechResult()
@@ -295,7 +297,7 @@ class AudioProcessorNode(Node):
             self.get_logger().error(f"Failed to create placeholder result: {e}")
 
     def process_speech_callback(self, request, response):
-        """Service callback for processing speech"""
+        """Handle service callback for processing speech."""
         try:
             self.get_logger().info("Processing speech service called")
             
@@ -319,7 +321,7 @@ class AudioProcessorNode(Node):
             return response
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'stream') and self.stream.active:
                 self.stream.stop()
@@ -329,7 +331,7 @@ class AudioProcessorNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

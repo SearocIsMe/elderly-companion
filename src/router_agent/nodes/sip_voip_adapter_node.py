@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-SIP/VoIP Adapter Node for Elderly Companion Robdog
-Handles emergency calling, family communication, and VoIP integration
-Critical component for UC2 - Emergency Call by voice
+SIP/VoIP Adapter Node for Elderly Companion Robdog.
+
+Handles emergency calling, family communication, and VoIP integration.
+Critical component for UC2 - Emergency Call by voice.
 """
 
 import rclpy
@@ -45,7 +46,7 @@ from elderly_companion.srv import EmergencyDispatch
 
 
 class CallState(Enum):
-    """Call states"""
+    """Call states."""
     IDLE = "idle"
     CALLING = "calling"
     RINGING = "ringing"
@@ -55,7 +56,7 @@ class CallState(Enum):
 
 
 class ContactType(Enum):
-    """Emergency contact types"""
+    """Emergency contact types."""
     FAMILY_PRIMARY = "family_primary"
     FAMILY_SECONDARY = "family_secondary"
     CAREGIVER = "caregiver"
@@ -66,7 +67,7 @@ class ContactType(Enum):
 
 @dataclass
 class EmergencyContact:
-    """Emergency contact information"""
+    """Emergency contact information."""
     contact_id: str
     name: str
     phone_number: str
@@ -82,7 +83,7 @@ class EmergencyContact:
 
 @dataclass
 class CallSession:
-    """Active call session data"""
+    """Active call session data."""
     session_id: str
     contact: EmergencyContact
     emergency_type: str
@@ -226,7 +227,7 @@ class SIPVoIPAdapterNode(Node):
         self.get_logger().info("SIP/VoIP Adapter Node initialized - Emergency calling ready")
 
     def initialize_emergency_contacts(self):
-        """Initialize emergency contacts database"""
+        """Initialize emergency contacts database."""
         try:
             # Default emergency contacts (would normally be loaded from config/database)
             default_contacts = [
@@ -279,7 +280,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Emergency contacts initialization error: {e}")
 
     def initialize_sip_stack(self):
-        """Initialize SIP/VoIP stack"""
+        """Initialize SIP/VoIP stack."""
         try:
             if not PJSUA_AVAILABLE:
                 self.get_logger().warning("PJSUA2 not available - using mock implementation")
@@ -324,7 +325,7 @@ class SIPVoIPAdapterNode(Node):
             self.sip_initialized = False
 
     def create_sip_account(self):
-        """Create and configure SIP account"""
+        """Create and configure SIP account."""
         try:
             if not self.sip_endpoint:
                 return
@@ -349,7 +350,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"SIP account creation error: {e}")
 
     def handle_emergency_alert_callback(self, msg: EmergencyAlert):
-        """Handle emergency alert and initiate calling sequence"""
+        """Handle emergency alert and initiate calling sequence."""
         try:
             self.get_logger().critical(f"EMERGENCY ALERT RECEIVED: {msg.emergency_type}")
             
@@ -367,7 +368,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Emergency alert handling error: {e}")
 
     def start_emergency_communication_sequence(self, alert: EmergencyAlert):
-        """Start emergency communication sequence with escalation"""
+        """Start emergency communication sequence with escalation."""
         try:
             # Get prioritized contact list
             contacts = self.get_prioritized_emergency_contacts(alert.emergency_type)
@@ -389,7 +390,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Emergency communication sequence error: {e}")
 
     def get_prioritized_emergency_contacts(self, emergency_type: str) -> List[EmergencyContact]:
-        """Get emergency contacts prioritized by emergency type"""
+        """Get emergency contacts prioritized by emergency type."""
         try:
             # Filter and sort contacts based on emergency type and priority
             contacts = list(self.emergency_contacts.values())
@@ -435,7 +436,7 @@ class SIPVoIPAdapterNode(Node):
             return []
 
     def initiate_emergency_call(self, contact: EmergencyContact, alert: EmergencyAlert):
-        """Initiate emergency call to contact"""
+        """Initiate emergency call to contact."""
         try:
             self.get_logger().critical(f"Calling emergency contact: {contact.name} ({contact.phone_number})")
             
@@ -465,7 +466,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Emergency call initiation error: {e}")
 
     def make_sip_call(self, contact: EmergencyContact, session: CallSession):
-        """Make actual SIP call"""
+        """Make actual SIP call."""
         try:
             if not self.sip_account or not PJSUA_AVAILABLE:
                 raise Exception("SIP account not available")
@@ -495,7 +496,7 @@ class SIPVoIPAdapterNode(Node):
             self.simulate_emergency_call(contact, session)
 
     def simulate_emergency_call(self, contact: EmergencyContact, session: CallSession):
-        """Simulate emergency call for development/testing"""
+        """Simulate emergency call for development/testing."""
         try:
             self.get_logger().info(f"Simulating emergency call to {contact.name}")
             
@@ -530,7 +531,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Call simulation error: {e}")
 
     def send_emergency_sms_notifications(self, alert: EmergencyAlert, contacts: List[EmergencyContact]):
-        """Send SMS notifications to emergency contacts"""
+        """Send SMS notifications to emergency contacts."""
         try:
             # Prepare SMS message
             message = self.create_emergency_sms_message(alert)
@@ -547,7 +548,7 @@ class SIPVoIPAdapterNode(Node):
             self.get_logger().error(f"Emergency SMS notification error: {e}")
 
     def create_emergency_sms_message(self, alert: EmergencyAlert) -> str:
-        """Create emergency SMS message content"""
+        """Create emergency SMS message content."""
         try:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
@@ -578,7 +579,7 @@ This is an automated message from the Elderly Companion Robot system.
             return "Emergency alert from Elderly Companion Robot. Please check on the elderly person immediately."
 
     def send_sms(self, phone_number: str, message: str):
-        """Send SMS using configured provider"""
+        """Send SMS using configured provider."""
         try:
             if self.sms_provider == 'twilio':
                 self.send_twilio_sms(phone_number, message)
@@ -591,7 +592,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"SMS sending error: {e}")
 
     def send_twilio_sms(self, phone_number: str, message: str):
-        """Send SMS via Twilio"""
+        """Send SMS via Twilio."""
         try:
             # This would use the Twilio Python SDK
             # For now, simulate the API call
@@ -610,7 +611,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"Twilio SMS error: {e}")
 
     def send_aws_sns_sms(self, phone_number: str, message: str):
-        """Send SMS via AWS SNS"""
+        """Send SMS via AWS SNS."""
         try:
             # This would use boto3 for AWS SNS
             self.get_logger().info(f"AWS SNS SMS simulation: {phone_number}")
@@ -619,7 +620,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"AWS SNS SMS error: {e}")
 
     def start_escalation_timer(self, alert: EmergencyAlert, contacts: List[EmergencyContact]):
-        """Start escalation timer for automatic call escalation"""
+        """Start escalation timer for automatic call escalation."""
         try:
             def escalation_check():
                 time.sleep(self.escalation_delay)
@@ -641,7 +642,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"Escalation timer error: {e}")
 
     def escalate_emergency_call(self, alert: EmergencyAlert, contacts: List[EmergencyContact]):
-        """Escalate to next level of emergency contacts"""
+        """Escalate to next level of emergency contacts."""
         try:
             self.escalation_level += 1
             
@@ -664,7 +665,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"Emergency escalation error: {e}")
 
     def publish_call_status(self, session: CallSession):
-        """Publish call status update"""
+        """Publish call status update."""
         try:
             status_data = {
                 "session_id": session.session_id,
@@ -686,7 +687,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"Call status publishing error: {e}")
 
     def publish_communication_result(self, status: str, message: str):
-        """Publish communication result"""
+        """Publish communication result."""
         try:
             result_data = {
                 "status": status,
@@ -704,7 +705,7 @@ This is an automated message from the Elderly Companion Robot system.
             self.get_logger().error(f"Communication result publishing error: {e}")
 
     def emergency_dispatch_callback(self, request, response):
-        """Service callback for emergency dispatch"""
+        """Handle service callback for emergency dispatch."""
         try:
             self.get_logger().critical(f"Emergency dispatch service called: {request.emergency_type}")
             
@@ -744,7 +745,7 @@ This is an automated message from the Elderly Companion Robot system.
             return response
 
     def __del__(self):
-        """Cleanup when node is destroyed"""
+        """Clean up when node is destroyed."""
         try:
             if hasattr(self, 'sip_endpoint') and self.sip_endpoint:
                 self.sip_endpoint.libDestroy()
@@ -755,7 +756,7 @@ This is an automated message from the Elderly Companion Robot system.
 # PJSUA2 callback classes
 if PJSUA_AVAILABLE:
     class ElderlyCompanionAccount(pj.Account):
-        """SIP Account for elderly companion robot"""
+        """SIP Account for elderly companion robot."""
         
         def __init__(self, node):
             pj.Account.__init__(self)
@@ -772,7 +773,7 @@ if PJSUA_AVAILABLE:
 
 
     class ElderlyEmergencyCall(pj.Call):
-        """Emergency call handler"""
+        """Emergency call handler."""
         
         def __init__(self, node, session_id):
             pj.Call.__init__(self, node.sip_account)
@@ -801,7 +802,7 @@ if PJSUA_AVAILABLE:
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:

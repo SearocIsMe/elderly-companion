@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Speech Recognition Node for Elderly Companion Robdog
-Handles Automatic Speech Recognition (ASR) using sherpa-onnx with RKNPU optimization
+Speech Recognition Node for Elderly Companion Robdog.
+
+Handles Automatic Speech Recognition (ASR) using sherpa-onnx with RKNPU optimization.
 """
 
 import rclpy
@@ -29,6 +30,7 @@ from elderly_companion.srv import ProcessSpeech
 class SpeechRecognitionNode(Node):
     """
     Speech Recognition Node using sherpa-onnx for elderly-optimized ASR.
+    
     Supports both Chinese and English recognition with elderly speech patterns.
     """
 
@@ -108,7 +110,7 @@ class SpeechRecognitionNode(Node):
         self.get_logger().info("Speech Recognition Node initialized successfully")
 
     def initialize_asr_model(self):
-        """Initialize the sherpa-onnx ASR model"""
+        """Initialize the sherpa-onnx ASR model."""
         try:
             # Configure ASR model based on deployment target
             if self.use_rknpu:
@@ -133,7 +135,7 @@ class SpeechRecognitionNode(Node):
             self.initialize_fallback_model()
 
     def create_rknpu_config(self):
-        """Create RKNPU-optimized configuration for RK3588"""
+        """Create RKNPU-optimized configuration for RK3588."""
         config = sherpa_onnx.OnlineRecognizerConfig(
             feat_config=sherpa_onnx.FeatureConfig(
                 sample_rate=self.sample_rate,
@@ -163,7 +165,7 @@ class SpeechRecognitionNode(Node):
         return config
 
     def create_cpu_config(self):
-        """Create CPU configuration for development"""
+        """Create CPU configuration for development."""
         config = sherpa_onnx.OnlineRecognizerConfig(
             feat_config=sherpa_onnx.FeatureConfig(
                 sample_rate=self.sample_rate,
@@ -189,13 +191,13 @@ class SpeechRecognitionNode(Node):
         return config
 
     def initialize_fallback_model(self):
-        """Initialize a fallback model for testing"""
+        """Initialize a fallback model for testing."""
         self.get_logger().warning("Using fallback speech recognition model")
         # Create a mock recognizer for development
         self.recognizer = None
 
     def process_audio_callback(self, msg: Audio):
-        """Process incoming audio messages"""
+        """Process incoming audio messages."""
         try:
             self.get_logger().debug("Received audio for speech recognition")
             
@@ -212,7 +214,7 @@ class SpeechRecognitionNode(Node):
             self.get_logger().error(f"Audio processing callback error: {e}")
 
     def recognize_speech(self, audio_data: np.ndarray, header: Header) -> Optional[SpeechResult]:
-        """Perform speech recognition on audio data"""
+        """Perform speech recognition on audio data."""
         try:
             start_time = time.time()
             
@@ -267,7 +269,7 @@ class SpeechRecognitionNode(Node):
             return self.create_error_result(header, str(e))
 
     def create_fallback_recognition_result(self, audio_data: np.ndarray, header: Header) -> SpeechResult:
-        """Create a fallback result for development/testing"""
+        """Create a fallback result for development/testing."""
         # Simulate recognition result
         duration = len(audio_data) / self.sample_rate
         
@@ -281,9 +283,9 @@ class SpeechRecognitionNode(Node):
         
         return self.create_speech_result(result_text, header, 50.0, False, duration)
 
-    def create_speech_result(self, text: str, header: Header, processing_time: float, 
+    def create_speech_result(self, text: str, header: Header, processing_time: float,
                            is_emergency: bool, duration: float) -> SpeechResult:
-        """Create a SpeechResult message"""
+        """Create a SpeechResult message."""
         result = SpeechResult()
         result.header = header
         result.text = text
@@ -314,7 +316,7 @@ class SpeechRecognitionNode(Node):
         return result
 
     def detect_emergency_keywords(self, text: str) -> bool:
-        """Detect emergency keywords in recognized text"""
+        """Detect emergency keywords in recognized text."""
         if not text:
             return False
         
@@ -330,7 +332,7 @@ class SpeechRecognitionNode(Node):
         return False
 
     def detect_elderly_patterns(self, text: str) -> bool:
-        """Detect elderly-specific speech patterns"""
+        """Detect elderly-specific speech patterns."""
         if not text or not self.elderly_patterns_enabled:
             return False
         
@@ -345,7 +347,7 @@ class SpeechRecognitionNode(Node):
         return False
 
     def create_error_result(self, header: Header, error_msg: str) -> SpeechResult:
-        """Create an error result"""
+        """Create an error result."""
         result = SpeechResult()
         result.header = header
         result.text = f"[Recognition Error: {error_msg}]"
@@ -366,7 +368,7 @@ class SpeechRecognitionNode(Node):
         return result
 
     def process_speech_service_callback(self, request, response):
-        """Service callback for speech processing"""
+        """Handle service callback for speech processing."""
         try:
             self.get_logger().info("Speech recognition service called")
             
@@ -402,7 +404,7 @@ class SpeechRecognitionNode(Node):
 
 
 def main(args=None):
-    """Main entry point"""
+    """Run the main entry point."""
     rclpy.init(args=args)
     
     try:
