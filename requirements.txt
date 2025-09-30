@@ -1,0 +1,31 @@
+# Simple Chat Loop Requirements
+# Basic dependencies for microphone-speaker chat functionality
+
+# Core dependencies (always required)
+speechrecognition==3.10.0
+pyttsx3==2.90
+numpy==1.24.3
+
+# Audio processing (install system dependencies first - see SIMPLE_SETUP.md)
+# Uncomment after installing system audio libraries:
+# pyaudio==0.2.11
+# sounddevice==0.4.6
+
+# Alternative audio libraries (if pyaudio fails)
+# soundfile==0.12.1
+# librosa==0.10.1
+
+# Optional: For better speech recognition (requires internet)
+# google-cloud-speech==2.21.0
+
+# Platform-specific installation notes:
+# See SIMPLE_SETUP.md for detailed system dependency installation
+
+# Install all essential ROS2 Python packages:
+empy==3.3.4
+catkin_pkg 
+lark
+setuptools 
+wheel
+pyyaml
+argcomplete

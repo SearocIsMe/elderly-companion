@@ -16,9 +16,6 @@ string language
 # Emotion analysis data
 EmotionData emotion
 
-# Speaker location (if available from mic array)
-geometry_msgs/Point speaker_location
-
 # Audio metadata
 float32 audio_duration_seconds
 int32 sample_rate
