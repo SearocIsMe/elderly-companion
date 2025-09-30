@@ -48,6 +48,8 @@ install(PROGRAMS
   src/router_agent/nodes/safety_guard_node.py
   src/router_agent/nodes/tts_engine_node.py
   src/router_agent/nodes/mqtt_adapter_node.py
+  src/router_agent/nodes/enhanced_guard_engine.py
+  src/router_agent/nodes/guard_integration_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
