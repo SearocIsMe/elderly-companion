@@ -55,7 +55,8 @@ graph TB
 ```
 
 ## Component View
-![Component View](./docs/RobDog -Elder Companion-component-view.png)
+![Component View](./docs/component-view.png)
+
 
 ## 🚀 Quick Start Options
 
