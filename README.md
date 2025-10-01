@@ -54,6 +54,9 @@ graph TB
     end
 ```
 
+## Component View
+![Component View](./docs/RobDog -Elder Companion-component-view.png)
+
 ## 🚀 Quick Start Options
 
 ### Option 1: Simple Chat Loop (Testing)
