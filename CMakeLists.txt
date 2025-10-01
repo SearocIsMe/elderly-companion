@@ -38,8 +38,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     std_msgs
 )
 
-# Install Python nodes for Router Agent architecture
+# Install Python nodes for Router Agent architecture - Enhanced Integration
 install(PROGRAMS
+  # Original router agent nodes
   src/router_agent/nodes/router_agent_coordinator.py
   src/router_agent/nodes/dialog_manager_node.py
   src/router_agent/nodes/speech_recognition_node.py
@@ -50,10 +51,21 @@ install(PROGRAMS
   src/router_agent/nodes/mqtt_adapter_node.py
   src/router_agent/nodes/enhanced_guard_engine.py
   src/router_agent/nodes/guard_integration_node.py
+  src/router_agent/nodes/sip_voip_adapter_node.py
+  
+  # Enhanced integration nodes (NEW)
+  src/router_agent/nodes/fastapi_bridge_node.py
+  src/router_agent/nodes/enhanced_router_coordinator.py
+  src/router_agent/nodes/silero_vad_node.py
+  src/router_agent/nodes/enhanced_tts_engine_node.py
+  src/router_agent/nodes/smart_home_backend_node.py
+  src/router_agent/nodes/webrtc_uplink_node.py
+  src/router_agent/nodes/guard_fastapi_bridge_node.py
+  
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# Install launch files (only if they exist)
+# Install launch files from both root and router_agent
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/launch")
   install(DIRECTORY launch/
     DESTINATION share/${PROJECT_NAME}/launch
@@ -61,11 +73,26 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/launch")
   )
 endif()
 
-# Install config files (only if they exist)
+# Install router_agent launch files under elderly_companion package
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/router_agent/launch")
+  install(DIRECTORY src/router_agent/launch/
+    DESTINATION share/router_agent/launch
+    FILES_MATCHING PATTERN "*.launch.py"
+  )
+endif()
+
+# Install config files from both root and router_agent
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/config")
   install(DIRECTORY config/
     DESTINATION share/${PROJECT_NAME}/config
     FILES_MATCHING PATTERN "*.yaml" PATTERN "*.yml" PATTERN "*.json"
+  )
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/router_agent/config")
+  install(DIRECTORY src/router_agent/config/
+    DESTINATION share/router_agent/config
+    FILES_MATCHING PATTERN "*.yaml" PATTERN "*.yml" PATTERN "*.json" PATTERN "*.py"
   )
 endif()
 

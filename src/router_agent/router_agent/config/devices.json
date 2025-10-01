@@ -1,0 +1,14 @@
+{
+  "light.living_room": {
+    "room": "living_room",
+    "type": "light"
+  },
+  "ac.living_room": {
+    "room": "living_room",
+    "type": "ac"
+  },
+  "lock.front_door": {
+    "room": "entrance",
+    "type": "lock"
+  }
+}

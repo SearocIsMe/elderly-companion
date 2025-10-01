@@ -1,0 +1,48 @@
+
+services:
+  llamacpp:
+    image: ghcr.io/ggerganov/llama.cpp:server
+    command: >
+      -m /models/qwen2.5-3b-instruct-gguf/Qwen2.5-3B-Instruct-Q4_K_M.gguf
+      -c ${CTX_LEN:-1024} -ngl ${LLAMA_NGL:-0} -t ${LLAMA_THREADS:-12}
+      --host 0.0.0.0 --port 8001
+    volumes:
+      - /mnt/c/Users/haipeng/Documents/00-code/models:/models   # 改成你本机模型目录
+    ports: ["8001:8001"]
+
+  intent:
+    image: python:3.11-slim
+    working_dir: /app
+    environment:
+      - LLM_BACKEND=llamacpp
+      - LLM_URL=http://llamacpp:8001/completion
+    volumes: ["../:/app"]
+    command: bash -lc "pip install fastapi uvicorn requests pydantic && uvicorn services.intent_service:APP --host 0.0.0.0 --port 7001"
+    ports: ["7001:7001"]
+    depends_on: [llamacpp]
+
+
+  guard:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes: ["../:/app"]
+    command: bash -lc "pip install fastapi uvicorn pyyaml pydantic && uvicorn services.guard_service:app --host 0.0.0.0 --port 7002"
+    ports: ["7002:7002"]
+  adapters:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes: ["../:/app"]
+    command: bash -lc "pip install fastapi uvicorn pydantic && uvicorn services.adapters_stub:app --host 0.0.0.0 --port 7003"
+    ports: ["7003:7003"]
+  orchestrator:
+    image: python:3.11-slim
+    working_dir: /app
+    environment:
+      - GUARD_URL=http://guard:7002/guard/check
+      - INTENT_URL=http://intent:7001/parse_intent
+      - SMART_URL=http://adapters:7003/smart-home/cmd
+      - SIP_URL=http://adapters:7003/sip/call
+    volumes: ["../:/app"]
+    command: bash -lc "pip install fastapi uvicorn requests pydantic && uvicorn services.orchestrator:app --host 0.0.0.0 --port 7010"
+    ports: ["7010:7010"]
+    depends_on: [guard, intent, adapters]

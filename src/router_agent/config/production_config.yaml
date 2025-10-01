@@ -1,0 +1,220 @@
+# Production Deployment Configuration
+# Optimized for production deployment with high availability and security
+
+# System settings for production
+system:
+  deployment_target: "production"
+  log_level: "WARN"
+  enable_debug_mode: false
+
+# Router Agent production settings
+router_agent:
+  mode: "hybrid"
+  startup_timeout_seconds: 90.0
+  response_timeout_seconds: 8.0
+  enable_component_health_monitoring: true
+
+# Audio system production settings
+audio:
+  sample_rate: 22050  # Higher quality for production
+  chunk_duration_ms: 80  # Optimized for responsiveness
+  
+  vad:
+    threshold: 0.6  # Higher threshold for production noise
+    
+  asr:
+    model_path: "/opt/models/sherpa-onnx-production"
+    use_rknpu: false  # Assume x86/GPU production server
+    max_active_paths: 8  # Higher for production server
+    
+  tts:
+    primary_engine: "edge_tts"  # Best quality for production
+    fallback_engine: "pyttsx3"
+    rate: 130
+    volume: 0.9
+
+# Elderly optimizations for production
+elderly:
+  speech_rate_multiplier: 0.85  # Balanced for production
+  pause_between_sentences: 0.6
+  repeat_important_keywords: true
+  volume_boost: 1.1
+  frequency_emphasis: true
+
+# Safety settings for production
+safety:
+  emergency_response_time_ms: 80  # Strict requirement for production
+  enhanced_guard:
+    enable_wakeword_detection: true
+    enable_sos_detection: true
+    enable_geofence_monitoring: true
+    enable_implicit_commands: true
+    
+  emergency:
+    max_call_attempts: 5  # More attempts in production
+    call_timeout_seconds: 60
+    escalation_delay_seconds: 60  # Faster escalation in production
+    record_calls: true
+    auto_retry_failed_calls: true
+
+# FastAPI services for production
+fastapi:
+  # Production URLs (configure load balancer if needed)
+  orchestrator_url: "http://fastapi-orchestrator:7010"
+  guard_url: "http://fastapi-guard:7002"
+  intent_url: "http://fastapi-intent:7001"
+  adapters_url: "http://fastapi-adapters:7003"
+  
+  enable_auto_start: true
+  startup_wait_seconds: 30
+  timeout_seconds: 8.0
+  retry_attempts: 5  # More retries for production reliability
+  
+  # Production Docker settings
+  enable_docker_integration: true
+  docker_compose_gpu: "../router_agent/docker/docker-compose.pc.gpu.yml"
+
+# Communication for production
+communication:
+  enable_sip_voip: true
+  enable_sms_notifications: true
+  enable_email_notifications: true
+  
+  sip:
+    server_host: "${SIP_SERVER_HOST}"  # Environment variable
+    server_port: 5060
+    username: "${SIP_USERNAME}"       # Environment variable
+    password: "${SIP_PASSWORD}"       # Environment variable
+    display_name: "Elderly Companion Robot"
+    transport: "TLS"  # Secure transport for production
+    backup_server_host: "${SIP_BACKUP_HOST}"
+    
+  sms:
+    provider: "twilio"
+    api_key: "${TWILIO_API_KEY}"      # Environment variable
+    api_secret: "${TWILIO_API_SECRET}" # Environment variable
+    from_number: "${TWILIO_FROM_NUMBER}" # Environment variable
+    enable_delivery_receipts: true
+    
+  email:
+    smtp_server: "${SMTP_SERVER}"     # Environment variable
+    smtp_port: 587
+    username: "${SMTP_USERNAME}"      # Environment variable
+    password: "${SMTP_PASSWORD}"      # Environment variable
+    use_tls: true
+
+# Smart home for production
+smart_home:
+  enable_automation: true
+  enable_emergency_scenes: true
+  enable_mqtt: true
+  enable_home_assistant: true
+  
+  homeassistant:
+    url: "${HOMEASSISTANT_URL}"       # Environment variable
+    token: "${HOMEASSISTANT_TOKEN}"   # Environment variable
+    ssl_verify: true
+    timeout: 10
+    
+  mqtt:
+    broker_host: "${MQTT_BROKER_HOST}" # Environment variable
+    broker_port: 1883
+    username: "${MQTT_USERNAME}"       # Environment variable
+    password: "${MQTT_PASSWORD}"       # Environment variable
+    keepalive: 60
+    qos: 2  # Higher QoS for production
+    
+  discovery:
+    auto_discover_devices: true
+    scan_interval: 300
+
+# Video streaming for production
+video:
+  enable_webrtc_streaming: true
+  enable_emergency_activation: true
+  family_access_enabled: true
+  privacy_mode_default: true  # Privacy by default in production
+  
+  webrtc:
+    server_host: "0.0.0.0"
+    server_port: 8080
+    ssl_enabled: true  # SSL required for production
+    ssl_cert_path: "/etc/ssl/certs/webrtc.crt"
+    ssl_key_path: "/etc/ssl/private/webrtc.key"
+    max_concurrent_sessions: 10  # Higher for production
+    
+  cameras:
+    main_camera_device: "/dev/video0"
+    robot_camera_device: "/dev/video1"
+    max_fps: 30
+    default_resolution: "1920x1080"  # Higher resolution for production
+    
+  quality:
+    default_quality: "high"
+    emergency_quality: "emergency"
+    max_bitrate_kbps: 3000  # Higher bitrate for production
+
+# Security settings for production
+security:
+  enable_authentication: true
+  session_timeout_minutes: 15  # Shorter for security
+  max_concurrent_sessions: 20
+  require_ssl: true
+  enable_rate_limiting: true
+  
+privacy:
+  enable_privacy_mode: true
+  blur_faces: true  # Enable face blurring in production
+  scheduled_privacy_hours: "22:00-06:00"  # Night privacy
+  data_retention_days: 90  # Longer retention for production
+  enable_encryption: true
+
+# Performance settings for production
+performance:
+  max_concurrent_commands: 10
+  command_timeout: 10
+  retry_attempts: 5
+  cache_frequent_phrases: true
+  max_cache_size: 200
+  enable_load_balancing: true
+
+# Monitoring for production
+monitoring:
+  enable_performance_tracking: true
+  enable_health_checks: true
+  health_check_interval: 15  # More frequent in production
+  log_all_decisions: true
+  alert_slow_decisions: true
+  enable_metrics_export: true
+  metrics_export_port: 9090
+
+# Logging for production
+logging:
+  enable_conversation_logging: true
+  enable_emergency_logging: true
+  enable_audit_logging: true
+  log_directory: "/var/log/elderly_companion"
+  max_log_size_mb: 500
+  retention_days: 90
+  log_rotation_enabled: true
+  
+# High availability settings
+high_availability:
+  enable_failover: true
+  health_check_timeout: 5
+  failover_delay_seconds: 30
+  backup_services_enabled: true
+  
+# Resource management for production
+resources:
+  max_memory_mb: 8192
+  max_cpu_percent: 70
+  enable_resource_monitoring: true
+  enable_auto_scaling: false
+  
+# Backup and recovery
+backup:
+  enable_configuration_backup: true
+  backup_interval_hours: 24
+  backup_retention_days: 30
+  backup_directory: "/var/backups/elderly_companion"

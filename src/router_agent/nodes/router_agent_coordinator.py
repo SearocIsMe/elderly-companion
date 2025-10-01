@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Router Agent Coordinator for Elderly Companion Robdog.
+Enhanced Router Agent Coordinator for Elderly Companion Robdog.
 
-This is the main coordinator node that implements the complete closed-loop chat system
-using the Router Agent (RK3588) architecture with AI-powered conversation and safety monitoring.
+Complete integration coordinator that orchestrates the full elderly companion system:
+- Audio Pipeline: Silero VAD → ASR → Emotion Analysis → Enhanced Guard
+- Core Logic: FastAPI Services (Guard → Intent → Orchestrator → Adapters)
+- Communication: SIP/VoIP Emergency Calling + SMS/Email Notifications
+- Smart Home: MQTT/Home Assistant Integration + Elderly Care Automation
+- Video: WebRTC Streaming to Family Frontend
+- Safety: Advanced Guard Engine + Emergency Response Protocols
+- Output: Enhanced TTS with Elderly Optimization
 
-Architecture Components:
-- Audio Processing Pipeline (VAD -> ASR -> Emotion Analysis)
-- Dialog Manager (AI-powered conversation flow)
-- Safety Monitoring (Emergency detection and response)
-- Text-to-Speech Output
-- Both text and microphone+speaker interfaces
+Architecture maintains proven FastAPI closed-loop functionality while adding
+comprehensive ROS2 integration and advanced elderly care features.
 """
 
 import rclpy
@@ -22,59 +24,160 @@ import json
 import time
 import threading
 import queue
-from typing import Dict, List, Optional, Any
-from datetime import datetime
+import requests
+import subprocess
+import os
+from typing import Dict, List, Optional, Any, Tuple
+from datetime import datetime, timedelta
 from enum import Enum
+import logging
 
 # ROS2 message imports
 from std_msgs.msg import Header, String, Bool
-from sensor_msgs.msg import Audio
+from sensor_msgs.msg import Audio, Image
 from elderly_companion.msg import (
-    SpeechResult, EmotionData, IntentResult, 
+    SpeechResult, EmotionData, IntentResult,
     HealthStatus, EmergencyAlert, SafetyConstraints
 )
-from elderly_companion.srv import ProcessSpeech, ValidateIntent
+from elderly_companion.srv import ProcessSpeech, ValidateIntent, ExecuteAction, EmergencyDispatch
 
 # Import dialog manager components
 from .dialog_manager_node import DialogManagerNode, ConversationState
 
 
 class RouterAgentMode(Enum):
-    """Router Agent operational modes."""
+    """Enhanced Router Agent operational modes."""
     TEXT_ONLY = "text_only"
     AUDIO_ONLY = "audio_only"
     HYBRID = "hybrid"
     EMERGENCY = "emergency"
+    MAINTENANCE = "maintenance"
+    DEMO = "demo"
 
 
-class RouterAgentCoordinator(Node):
-    """
-    Main Router Agent Coordinator Node.
+class SystemComponent(Enum):
+    """System components for status tracking."""
+    SILERO_VAD = "silero_vad"
+    SPEECH_RECOGNITION = "speech_recognition"
+    ENHANCED_GUARD = "enhanced_guard"
+    GUARD_FASTAPI_BRIDGE = "guard_fastapi_bridge"
+    FASTAPI_BRIDGE = "fastapi_bridge"
+    ENHANCED_TTS = "enhanced_tts"
+    SIP_VOIP_ADAPTER = "sip_voip_adapter"
+    SMART_HOME_BACKEND = "smart_home_backend"
+    WEBRTC_UPLINK = "webrtc_uplink"
+    DIALOG_MANAGER = "dialog_manager"
+    EMOTION_ANALYZER = "emotion_analyzer"
     
-    Coordinates all components for complete closed-loop chat:
-    1. Input: Text or Microphone
-    2. Processing: Audio Pipeline -> Dialog Manager -> Safety Monitoring
-    3. Output: Text display and/or Speaker (TTS)
+    # FastAPI Services
+    FASTAPI_ORCHESTRATOR = "fastapi_orchestrator"
+    FASTAPI_GUARD = "fastapi_guard"
+    FASTAPI_INTENT = "fastapi_intent"
+    FASTAPI_ADAPTERS = "fastapi_adapters"
+
+
+class EnhancedRouterAgentCoordinator(Node):
+    """
+    Enhanced Router Agent Coordinator - Complete Integration Orchestrator.
+    
+    Orchestrates the complete elderly companion system:
+    
+    Audio Pipeline:
+    1. Silero VAD → Speech Recognition → Emotion Analysis
+    2. Enhanced Guard Engine (wakeword, SOS, geofence, implicit commands)
+    3. Guard-FastAPI Bridge → FastAPI Guard Service
+    
+    Core Processing:
+    4. FastAPI Orchestrator → Intent Service → Adapters
+    5. FastAPI Bridge ↔ ROS2 Integration
+    
+    Output & Communication:
+    6. Enhanced TTS Engine (elderly-optimized speech synthesis)
+    7. SIP/VoIP Adapter (emergency calling with escalation)
+    8. Smart-Home Backend (MQTT/HA integration)
+    9. WebRTC Uplink (family video streaming)
+    
+    This coordinator maintains the proven FastAPI closed-loop functionality
+    while orchestrating all ROS2 components for comprehensive elderly care.
     """
 
     def __init__(self):
-        super().__init__('router_agent_coordinator')
+        super().__init__('enhanced_router_agent_coordinator')
         
-        # Initialize parameters
+        # Initialize comprehensive parameters
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('router_agent.mode', 'hybrid'),  # text_only, audio_only, hybrid
+                # System Mode and Operation
+                ('router_agent.mode', 'hybrid'),  # text_only, audio_only, hybrid, emergency
                 ('router_agent.enable_safety_monitoring', True),
                 ('router_agent.enable_conversation_logging', True),
                 ('router_agent.response_timeout_seconds', 10.0),
+                ('router_agent.startup_timeout_seconds', 60.0),
+                ('router_agent.enable_component_health_monitoring', True),
+                
+                # Audio System Configuration
                 ('audio.enable_microphone', True),
                 ('audio.enable_speaker', True),
-                ('text.enable_console_interface', True),
-                ('text.enable_web_interface', False),
-                ('safety.emergency_response_time_ms', 200),
+                ('audio.enable_silero_vad', True),
+                ('audio.enable_noise_reduction', True),
+                ('audio.sample_rate', 16000),
+                
+                # User Interface Configuration
+                ('ui.enable_console_interface', True),
+                ('ui.enable_web_interface', True),
+                ('ui.enable_family_app_interface', True),
+                ('ui.console_welcome_message', True),
+                
+                # Safety and Emergency Configuration
+                ('safety.emergency_response_time_ms', 100),  # Faster for elderly
+                ('safety.enable_enhanced_guard', True),
+                ('safety.enable_guard_fastapi_bridge', True),
+                ('safety.emergency_escalation_enabled', True),
+                ('safety.proactive_safety_monitoring', True),
+                
+                # FastAPI Services Configuration
+                ('fastapi.orchestrator_url', 'http://localhost:7010'),
+                ('fastapi.guard_url', 'http://localhost:7002'),
+                ('fastapi.intent_url', 'http://localhost:7001'),
+                ('fastapi.adapters_url', 'http://localhost:7003'),
+                ('fastapi.enable_auto_start', True),
+                ('fastapi.startup_wait_seconds', 30),
+                
+                # Communication Configuration
+                ('communication.enable_sip_voip', True),
+                ('communication.enable_sms_notifications', True),
+                ('communication.enable_email_notifications', True),
+                ('communication.emergency_contacts_required', True),
+                
+                # Smart Home Configuration
+                ('smart_home.enable_automation', True),
+                ('smart_home.enable_emergency_scenes', True),
+                ('smart_home.enable_mqtt', True),
+                ('smart_home.enable_home_assistant', True),
+                
+                # Video Streaming Configuration
+                ('video.enable_webrtc_streaming', True),
+                ('video.enable_emergency_activation', True),
+                ('video.family_access_enabled', True),
+                ('video.privacy_mode_default', False),
+                
+                # AI and Conversation
                 ('ai.conversation_model', 'local'),  # local, openai, ollama
                 ('ai.safety_level', 'elderly_care'),
+                ('ai.enable_emotion_awareness', True),
+                ('ai.enable_context_memory', True),
+                
+                # Performance and Monitoring
+                ('monitoring.enable_performance_tracking', True),
+                ('monitoring.enable_health_checks', True),
+                ('monitoring.health_check_interval', 30),
+                ('monitoring.log_level', 'INFO'),
+                
+                # Deployment Configuration
+                ('deployment.target', 'development'),  # development, rk3588, production
+                ('deployment.enable_docker_integration', True),
+                ('deployment.config_directory', './config'),
             ]
         )
         
@@ -85,23 +188,63 @@ class RouterAgentCoordinator(Node):
         self.response_timeout = self.get_parameter('router_agent.response_timeout_seconds').value
         self.enable_microphone = self.get_parameter('audio.enable_microphone').value
         self.enable_speaker = self.get_parameter('audio.enable_speaker').value
-        self.enable_console = self.get_parameter('text.enable_console_interface').value
+        self.enable_console = self.get_parameter('ui.enable_console_interface').value
+        self.enable_enhanced_guard = self.get_parameter('safety.enable_enhanced_guard').value
+        self.enable_smart_home = self.get_parameter('smart_home.enable_automation').value
+        self.enable_video_streaming = self.get_parameter('video.enable_webrtc_streaming').value
+        self.enable_sip_voip = self.get_parameter('communication.enable_sip_voip').value
+        self.deployment_target = self.get_parameter('deployment.target').value
         
-        # State management
+        # FastAPI services configuration
+        self.fastapi_urls = {
+            'orchestrator': self.get_parameter('fastapi.orchestrator_url').value,
+            'guard': self.get_parameter('fastapi.guard_url').value,
+            'intent': self.get_parameter('fastapi.intent_url').value,
+            'adapters': self.get_parameter('fastapi.adapters_url').value
+        }
+        
+        # System state management
         self.is_active = False
         self.current_conversation_id = None
         self.last_response_time = None
         self.pending_responses = queue.Queue()
+        self.system_startup_complete = False
         
-        # Component status tracking
+        # Enhanced component status tracking
         self.component_status = {
-            'audio_processor': False,
-            'speech_recognition': False,
-            'emotion_analyzer': False,
-            'dialog_manager': False,
-            'safety_guard': False,
-            'tts_engine': False
+            # Core ROS2 Components
+            SystemComponent.SILERO_VAD.value: False,
+            SystemComponent.SPEECH_RECOGNITION.value: False,
+            SystemComponent.ENHANCED_GUARD.value: False,
+            SystemComponent.GUARD_FASTAPI_BRIDGE.value: False,
+            SystemComponent.FASTAPI_BRIDGE.value: False,
+            SystemComponent.ENHANCED_TTS.value: False,
+            SystemComponent.SIP_VOIP_ADAPTER.value: False,
+            SystemComponent.SMART_HOME_BACKEND.value: False,
+            SystemComponent.WEBRTC_UPLINK.value: False,
+            SystemComponent.DIALOG_MANAGER.value: False,
+            SystemComponent.EMOTION_ANALYZER.value: False,
+            
+            # FastAPI Services
+            SystemComponent.FASTAPI_ORCHESTRATOR.value: False,
+            SystemComponent.FASTAPI_GUARD.value: False,
+            SystemComponent.FASTAPI_INTENT.value: False,
+            SystemComponent.FASTAPI_ADAPTERS.value: False
         }
+        
+        # Performance and health monitoring
+        self.component_health_data: Dict[str, Dict[str, Any]] = {}
+        self.system_metrics = {
+            'total_conversations': 0,
+            'emergency_responses': 0,
+            'successful_actions': 0,
+            'system_uptime_start': datetime.now(),
+            'last_health_check': None
+        }
+        
+        # Service clients for component communication
+        self.service_clients = {}
+        self.initialize_service_clients()
         
         # QoS profiles
         default_qos = QoSProfile(

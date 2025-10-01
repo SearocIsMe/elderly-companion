@@ -1,0 +1,29 @@
+wakewords: ["小安", "hey elderbot"]
+sos_keywords: ["救命", "不舒服", "摔倒了", "help", "救护车", "心口疼"]
+
+rate_limit:
+  max_intents_per_min: 15
+  burst: 5
+
+device_whitelist:
+  light.living_room: ["on","off","brightness_up","brightness_down"]
+  ac.living_room: ["on","off","temp_up","temp_down","set_mode"]
+  lock.front_door: ["lock"]
+
+geofence:
+  living_room: { polygon: [[0,0],[5,0],[5,4],[0,4]] }
+  bedroom:     { polygon: [[6,0],[9,0],[9,4],[6,4]] }
+  balcony:     { polygon: [[5,4],[9,4],[9,6],[5,6]] }
+
+risk_policies:
+  - intent: "lock.unlock"
+    require_confirm: true
+  - intent: "assist.move"
+    max_speed: "slow"
+    forbidden_zones: ["balcony","stairs"]
+  - intent: "call.emergency"
+    bypass_dialog: true
+
+logging:
+  keep_days: 7
+  redact_fields: ["text","raw_audio_path"]

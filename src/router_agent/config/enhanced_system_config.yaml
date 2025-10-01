@@ -1,0 +1,370 @@
+# Enhanced Elderly Companion System Configuration
+# Main configuration file for complete system integration
+
+# System-wide settings
+system:
+  name: "Elderly Companion Robot"
+  version: "2.0.0"
+  deployment_target: "development"  # development, rk3588, production
+  log_level: "INFO"
+  enable_debug_mode: false
+
+# Router Agent Core Configuration
+router_agent:
+  mode: "hybrid"  # text_only, audio_only, hybrid, emergency
+  enable_safety_monitoring: true
+  enable_conversation_logging: true
+  response_timeout_seconds: 10.0
+  startup_timeout_seconds: 120.0
+  enable_component_health_monitoring: true
+
+# Audio System Configuration
+audio:
+  enable_microphone: true
+  enable_speaker: true
+  enable_silero_vad: true
+  enable_noise_reduction: true
+  sample_rate: 16000
+  chunk_duration_ms: 100
+  
+  # Silero VAD Settings
+  vad:
+    threshold: 0.5
+    min_speech_duration_ms: 300
+    max_speech_duration_ms: 30000
+    min_silence_duration_ms: 500
+    
+  # ASR Settings
+  asr:
+    model_path: "/models/sherpa-onnx/chinese-english"
+    language: "zh-CN"
+    use_rknpu: false  # Set to true for RK3588
+    
+  # TTS Settings
+  tts:
+    primary_engine: "pyttsx3"
+    rate: 120
+    volume: 0.85
+    voice_id_chinese: "zh-CN-XiaoxiaoNeural"
+    voice_id_english: "en-US-AriaNeural"
+
+# Elderly-Specific Optimizations
+elderly:
+  # Speech Optimizations
+  speech_rate_multiplier: 0.8
+  pause_between_sentences: 0.8
+  repeat_important_keywords: true
+  volume_boost: 1.2
+  frequency_emphasis: true
+  
+  # Interface Optimizations
+  simplified_controls: true
+  voice_confirmations: true
+  longer_timeouts: true
+  
+  # Safety Optimizations
+  emergency_keyword_sensitivity: 0.7  # Lower threshold
+  health_monitoring_enabled: true
+  proactive_safety_alerts: true
+
+# Safety and Emergency Configuration
+safety:
+  emergency_response_time_ms: 100
+  enable_enhanced_guard: true
+  enable_guard_fastapi_bridge: true
+  emergency_escalation_enabled: true
+  proactive_safety_monitoring: true
+  
+  # Enhanced Guard Settings
+  enhanced_guard:
+    enable_wakeword_detection: true
+    enable_sos_detection: true
+    enable_geofence_monitoring: true
+    enable_implicit_commands: true
+    
+  # Emergency Response
+  emergency:
+    max_call_attempts: 3
+    call_timeout_seconds: 45
+    escalation_delay_seconds: 90
+    record_calls: true
+    auto_retry_failed_calls: true
+
+# FastAPI Services Configuration
+fastapi:
+  # Service URLs
+  orchestrator_url: "http://localhost:7010"
+  guard_url: "http://localhost:7002" 
+  intent_url: "http://localhost:7001"
+  adapters_url: "http://localhost:7003"
+  
+  # Integration Settings
+  enable_auto_start: true
+  startup_wait_seconds: 30
+  timeout_seconds: 10.0
+  retry_attempts: 3
+  
+  # Docker Settings
+  enable_docker_integration: true
+  docker_compose_pc: "../router_agent/docker/docker-compose.pc.yml"
+  docker_compose_rk3588: "../router_agent/docker/docker-compose.rk3588.yml"
+  docker_compose_gpu: "../router_agent/docker/docker-compose.pc.gpu.yml"
+
+# Communication Systems Configuration
+communication:
+  enable_sip_voip: true
+  enable_sms_notifications: true
+  enable_email_notifications: true
+  
+  # SIP/VoIP Settings
+  sip:
+    server_host: ""  # Configure in production
+    server_port: 5060
+    username: ""     # Configure in production
+    password: ""     # Configure in production
+    display_name: "Elderly Companion Robot"
+    transport: "UDP"
+    
+  # SMS Settings
+  sms:
+    provider: "twilio"  # twilio, aws_sns
+    api_key: ""         # Configure in production
+    api_secret: ""      # Configure in production
+    from_number: ""     # Configure in production
+    
+  # Email Settings
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    username: ""        # Configure in production
+    password: ""        # Configure in production
+    use_tls: true
+
+# Smart Home Integration Configuration
+smart_home:
+  enable_automation: true
+  enable_emergency_scenes: true
+  enable_mqtt: true
+  enable_home_assistant: true
+  
+  # Home Assistant Settings
+  homeassistant:
+    url: "http://homeassistant.local:8123"
+    token: ""           # Configure in production
+    ssl_verify: true
+    timeout: 10
+    
+  # MQTT Settings
+  mqtt:
+    broker_host: "localhost"
+    broker_port: 1883
+    username: ""        # Configure if needed
+    password: ""        # Configure if needed
+    keepalive: 60
+    qos: 1
+    
+  # Device Discovery
+  discovery:
+    auto_discover_devices: true
+    scan_interval: 300
+
+# Video Streaming Configuration
+video:
+  enable_webrtc_streaming: true
+  enable_emergency_activation: true
+  family_access_enabled: true
+  privacy_mode_default: false
+  
+  # WebRTC Settings
+  webrtc:
+    server_host: "0.0.0.0"
+    server_port: 8080
+    ssl_enabled: false
+    max_concurrent_sessions: 5
+    
+  # Camera Settings
+  cameras:
+    enable_auto_discovery: true
+    main_camera_device: "/dev/video0"
+    robot_camera_device: "/dev/video1"
+    max_fps: 30
+    default_resolution: "1280x720"
+    
+  # Quality Settings
+  quality:
+    default_quality: "medium"
+    emergency_quality: "emergency"
+    adaptive_quality: true
+    max_bitrate_kbps: 2000
+
+# User Interface Configuration
+ui:
+  enable_console_interface: true
+  enable_web_interface: true
+  enable_family_app_interface: true
+  console_welcome_message: true
+
+# AI and Conversation Configuration
+ai:
+  conversation_model: "local"
+  safety_level: "elderly_care"
+  enable_emotion_awareness: true
+  enable_context_memory: true
+
+# Performance and Monitoring Configuration
+monitoring:
+  enable_performance_tracking: true
+  enable_health_checks: true
+  health_check_interval: 30
+  log_all_decisions: true
+  alert_slow_decisions: true
+
+# Emergency Contacts Configuration (Template)
+emergency_contacts:
+  family_primary:
+    name: "Primary Family Contact"
+    phone_number: "+1234567890"  # CONFIGURE IN PRODUCTION
+    email: "family@example.com"   # CONFIGURE IN PRODUCTION
+    relationship: "Child/Spouse"
+    priority: 1
+    sms_enabled: true
+    voice_call_enabled: true
+    
+  caregiver:
+    name: "Primary Caregiver"
+    phone_number: "+1234567891"  # CONFIGURE IN PRODUCTION
+    email: "caregiver@example.com" # CONFIGURE IN PRODUCTION
+    relationship: "Caregiver"
+    priority: 2
+    sms_enabled: true
+    voice_call_enabled: true
+    
+  doctor:
+    name: "Family Doctor"
+    phone_number: "+1234567892"  # CONFIGURE IN PRODUCTION
+    email: "doctor@example.com"   # CONFIGURE IN PRODUCTION
+    relationship: "Doctor"
+    priority: 3
+    available_hours: "9AM-5PM"
+    
+  emergency_services:
+    name: "Emergency Services"
+    phone_number: "911"          # CONFIGURE FOR LOCAL EMERGENCY NUMBER
+    relationship: "Emergency Services"
+    priority: 10
+    sms_enabled: false
+    voice_call_enabled: true
+
+# Device Configuration (Smart Home)
+smart_devices:
+  living_room:
+    main_light:
+      name: "客厅主灯"
+      type: "light"
+      ha_entity_id: "light.living_room_main"
+      mqtt_topic: "homeassistant/light/living_room_main/state"
+      capabilities: ["brightness", "color_temp", "on_off"]
+      elderly_priority: 2
+      safety_critical: true
+      voice_controllable: true
+      
+    air_conditioner:
+      name: "客厅空调"
+      type: "climate"
+      ha_entity_id: "climate.living_room_ac"
+      mqtt_topic: "homeassistant/climate/living_room_ac/state"
+      capabilities: ["temperature", "mode", "fan_speed"]
+      elderly_priority: 1
+      safety_critical: true
+      voice_controllable: true
+      
+  bedroom:
+    light:
+      name: "卧室灯"
+      type: "light"
+      ha_entity_id: "light.bedroom"
+      mqtt_topic: "homeassistant/light/bedroom/state"
+      capabilities: ["brightness", "on_off"]
+      elderly_priority: 2
+      safety_critical: true
+      voice_controllable: true
+      
+    emergency_button:
+      name: "卧室紧急按钮"
+      type: "emergency"
+      ha_entity_id: "binary_sensor.bedroom_emergency"
+      mqtt_topic: "homeassistant/binary_sensor/bedroom_emergency/state"
+      capabilities: ["press_detection"]
+      elderly_priority: 1
+      safety_critical: true
+      voice_controllable: false
+
+# Scene Configuration for Elderly Care
+scenes:
+  morning_routine:
+    name: "早安模式"
+    description: "温和的晨起照明和舒适温度"
+    trigger_phrases: ["早安模式", "晨起模式", "morning scene"]
+    devices:
+      living_room_main_light: {"state": "on", "brightness": 60}
+      bedroom_light: {"state": "on", "brightness": 40}
+      living_room_ac: {"state": "on", "temperature": 24}
+    confirmation_required: false
+    voice_feedback: true
+    
+  evening_routine:
+    name: "晚安模式"
+    description: "温馨的晚间照明准备就寝"
+    trigger_phrases: ["晚安模式", "睡觉模式", "evening scene"]
+    devices:
+      living_room_main_light: {"state": "on", "brightness": 30}
+      bedroom_light: {"state": "on", "brightness": 20}
+      living_room_ac: {"state": "on", "temperature": 22}
+    confirmation_required: false
+    voice_feedback: true
+    
+  emergency_response:
+    name: "紧急模式"
+    description: "紧急情况下的全屋照明和安全设置"
+    trigger_phrases: ["紧急模式", "emergency mode"]
+    devices:
+      living_room_main_light: {"state": "on", "brightness": 100}
+      bedroom_light: {"state": "on", "brightness": 100}
+      living_room_ac: {"state": "on", "temperature": 22}
+    confirmation_required: false
+    voice_feedback: true
+    gradual_transition: false
+
+# Security and Privacy Configuration
+security:
+  enable_authentication: true
+  session_timeout_minutes: 30
+  max_concurrent_sessions: 5
+  
+privacy:
+  enable_privacy_mode: true
+  blur_faces: false
+  scheduled_privacy_hours: ""
+  data_retention_days: 30
+  
+# Network Configuration
+network:
+  adaptive_bitrate: true
+  bandwidth_detection: true
+  min_quality_threshold: "low"
+  
+# Logging Configuration
+logging:
+  enable_conversation_logging: true
+  enable_emergency_logging: true
+  log_directory: "/var/log/elderly_companion"
+  max_log_size_mb: 100
+  retention_days: 30
+  
+# Performance Configuration
+performance:
+  max_concurrent_commands: 5
+  command_timeout: 15
+  retry_attempts: 3
+  cache_frequent_phrases: true
+  max_cache_size: 100

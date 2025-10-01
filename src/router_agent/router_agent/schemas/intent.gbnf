@@ -1,0 +1,26 @@
+# schemas/intent.gbnf
+root          ::= obj
+obj           ::= "{" ws members? ws "}"
+members       ::= pair (ws "," ws pair)*
+pair          ::= ws key ws ":" ws value
+key           ::= "\"intent\"" | "\"device\"" | "\"action\"" | "\"room\"" | "\"target\"" | "\"speed\"" | "\"callee\"" | "\"reason\"" | "\"mood\"" | "\"playlist\"" | "\"require_confirm\"" | "\"confidence\"" | "\"need\"" | "\"ask\""
+
+value         ::= string | number | boolean | null | obj | array
+
+array         ::= "[" ws elements? ws "]"
+elements      ::= value (ws "," ws value)*
+string        ::= "\"" chars? "\""
+chars         ::= char+
+char          ::= unescaped | escape
+unescaped     ::= [^"\\]
+escape        ::= "\\" (["\\/bfnrt] | "u" hex hex hex hex)
+
+number        ::= int frac? exp?
+int           ::= "-"? ("0" | [1-9][0-9]*)
+frac          ::= "." [0-9]+
+exp           ::= [eE] [+\-]? [0-9]+
+
+boolean       ::= "true" | "false"
+null          ::= "null"
+hex           ::= [0-9a-fA-F]
+ws            ::= [ \t\n\r]* 

@@ -17,8 +17,9 @@
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-  <!-- Audio Processing -->
-  <!-- Audio dependencies will be handled via custom message definitions when needed -->
+  
+  <!-- Message Dependencies -->
+  <depend>elderly_companion</depend>  <!-- For custom messages -->
   
   <!-- Communication -->
   <depend>rosbridge_library</depend>
@@ -26,6 +27,8 @@
   <!-- Python Dependencies (handled via pip) -->
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-scipy</exec_depend>
+  <exec_depend>python3-requests</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
   
   <!-- Development Dependencies -->
   <test_depend>ament_lint_auto</test_depend>
