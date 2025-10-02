@@ -32,7 +32,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Install Docker Compose if not present
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker-compose &> /dev/null && ! command -v docker &> /dev/null; then
     echo "🐳 Installing Docker Compose..."
     sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
@@ -124,7 +124,7 @@ fi
 
 # Build Docker containers
 echo "🐳 Building Docker containers..."
-docker-compose build
+docker compose build
 
 # Create environment configuration
 echo "⚙️  Creating environment configuration..."
@@ -171,6 +171,6 @@ echo ""
 echo "Next steps:"
 echo "1. Log out and log back in (for Docker group membership)"
 echo "2. Run: source ~/.bashrc"
-echo "3. Run: docker-compose up -d"
+echo "3. Run: docker compose up -d"
 echo "4. Run: ./scripts/build_workspace.sh"
 echo "5. Start coding! 🚀"

@@ -20,7 +20,7 @@ DOCKER_COMPOSE_FILE="src/router_agent/router_agent/docker/docker-compose.pc.yml"
 if [ -f "$DOCKER_COMPOSE_FILE" ] && command -v docker-compose &> /dev/null; then
     echo "Starting Docker services..."
     cd src/router_agent/router_agent/docker
-    docker-compose -f docker-compose.pc.yml up -d || echo "⚠️ Docker services failed, continuing..."
+    docker compose -f docker-compose.pc.yml up -d || echo "⚠️ Docker services failed, continuing..."
     cd ../../../..
     sleep 5
     

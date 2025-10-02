@@ -271,7 +271,7 @@ source install/setup.bash
 
 # 2. Start FastAPI services
 cd src/router_agent/router_agent/docker
-docker-compose -f docker-compose.pc.yml up -d
+docker compose -f docker-compose.pc.yml up -d
 cd ../../../..
 
 # 3. Verify services
@@ -304,10 +304,10 @@ sudo systemctl status elderly-companion-router-agent.service
 ```bash
 # Use production Docker compose
 cd src/router_agent/router_agent/docker
-docker-compose -f docker-compose.pc.gpu.yml up -d
+docker compose -f docker-compose.pc.gpu.yml up -d
 
 # Or for full production
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml up -d
 ```
 
 ---
@@ -523,7 +523,7 @@ netstat -tulpn | grep -E ':(7001|7002|7003|7010)'
 ros2 topic echo /router_agent/system_status
 
 # View Docker logs
-docker-compose logs -f
+docker compose logs -f
 
 # View system resources
 htop

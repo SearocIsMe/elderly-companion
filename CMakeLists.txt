@@ -50,16 +50,13 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 # Install Python nodes for Router Agent architecture - Enhanced Integration
 install(PROGRAMS
   # Original router agent nodes
-  src/router_agent/nodes/router_agent_coordinator.py
   src/router_agent/nodes/dialog_manager_node.py
   src/router_agent/nodes/speech_recognition_node.py
   src/router_agent/nodes/audio_processor_node.py
   src/router_agent/nodes/emotion_analyzer_node.py
   src/router_agent/nodes/safety_guard_node.py
-  src/router_agent/nodes/tts_engine_node.py
   src/router_agent/nodes/mqtt_adapter_node.py
   src/router_agent/nodes/enhanced_guard_engine.py
-  src/router_agent/nodes/guard_integration_node.py
   src/router_agent/nodes/sip_voip_adapter_node.py
   
   # Enhanced integration nodes (NEW)

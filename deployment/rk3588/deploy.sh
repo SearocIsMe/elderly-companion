@@ -113,7 +113,7 @@ prepare_deployment_package() {
     cp -r scripts/* $PACKAGE_DIR/scripts/
     
     # Copy configuration files
-    cp docker-compose.yml $PACKAGE_DIR/
+    cp src/router_agent/router_agent/docker/docker-compose.pc.yml $PACKAGE_DIR/
     cp package.xml $PACKAGE_DIR/
     cp CMakeLists.txt $PACKAGE_DIR/
     
