@@ -89,14 +89,18 @@ docker-compose --version
 # Audio development libraries (required for pyaudio)
 sudo apt install -y \
     portaudio19-dev \
-    pulseaudio-dev \
+    libpulse-dev \
     alsa-utils \
-    libasound2-dev
+    libasound2-dev \
+    libsndfile1-dev \
+    libjack-jackd2-dev
 
 # Additional audio tools
 sudo apt install -y \
     pavucontrol \
-    audacity
+    audacity \
+    pulseaudio \
+    pulseaudio-utils
 ```
 
 ### 3.2 Build and Development Tools
@@ -200,11 +204,32 @@ sudo python3 -m pip install \
 ### 5.2 Install All Dependencies
 
 ```bash
-# Install all dependencies from requirements.txt
-sudo python3 -m pip install -r requirements.txt
+# Install all dependencies from requirements.txt (with conflict resolution)
+sudo python3 -m pip install -r requirements.txt --ignore-installed
+
+# Alternative: If above fails due to distutils conflicts
+sudo python3 -m pip install -r requirements.txt --force-reinstall --no-deps
+sudo python3 -m pip install -r requirements.txt  # Install dependencies separately
 ```
 
-**Note**: Some packages may fail due to missing system dependencies. Install system dependencies first, then retry.
+**Note**: Some packages may fail due to missing system dependencies or conflicts with system packages.
+
+#### 5.2.1 Handling Package Conflicts
+
+If you encounter "distutils installed project" errors:
+
+```bash
+# Method 1: Skip problematic packages and install manually
+pip install -r requirements.txt --ignore-installed sympy
+
+# Method 2: Use virtual environment (recommended for development)
+python3 -m venv elderly_companion_env
+source elderly_companion_env/bin/activate
+pip install -r requirements.txt
+
+# Method 3: Force reinstall specific conflicting packages
+sudo python3 -m pip install --force-reinstall --no-deps sympy==1.12
+```
 
 ---
 
@@ -408,6 +433,48 @@ source install/setup.bash
 # Solution: Use system Python
 conda deactivate
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+```
+
+#### ROS2 Build Errors (ModuleNotFoundError: No module named 'em')
+```bash
+# This error occurs when using conda environments with ROS2
+# Solution 1: Install missing ROS2 Python dependencies in conda environment
+pip install empy catkin_pkg lark setuptools wheel argcomplete
+
+# Solution 2: Ensure all ROS2 dependencies are installed
+pip install colcon-common-extensions colcon-ros
+
+# Solution 3: If still failing, deactivate conda and use system Python
+conda deactivate
+export PATH="/usr/bin:/usr/local/bin:$PATH"
+./scripts/build.sh
+
+# Solution 4: Install ROS2 Python packages specifically
+sudo apt install python3-colcon-common-extensions python3-rosdep
+pip install --upgrade setuptools wheel
+```
+
+#### ROS2 Build Errors (AttributeError: module 'em' has no attribute 'BUFFERED_OPT')
+```bash
+# This error indicates empy version incompatibility with ROS2 Humble
+# Solution 1: Install specific empy version compatible with ROS2 Humble
+pip uninstall empy
+pip install empy==3.3.4
+
+# Solution 2: Use system empy package instead
+pip uninstall empy
+sudo apt install python3-empy
+
+# Solution 3: Complete clean reinstall of ROS2 dependencies
+pip uninstall empy catkin_pkg lark setuptools wheel argcomplete
+sudo apt install python3-empy python3-catkin-pkg python3-lark
+pip install setuptools wheel argcomplete
+
+# Solution 4: Force use of system Python with ROS2
+conda deactivate
+sudo apt install python3-colcon-common-extensions
+export PATH="/usr/bin:/usr/local/bin:$PATH"
+./scripts/build.sh
 ```
 
 #### Audio Package Installation Failures
