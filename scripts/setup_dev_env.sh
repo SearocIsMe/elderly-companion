@@ -44,10 +44,42 @@ if ! command -v ros2 &> /dev/null; then
     
     # Add ROS2 repository
     sudo apt install software-properties-common -y
-    sudo add-apt-repository universe -y
+    
+    # Fix for apt_pkg module error - reinstall python3-apt to ensure it's working
+    echo "🔧 Fixing apt_pkg module issue..."
+    sudo apt remove --purge python3-apt -y || true
+    sudo apt install python3-apt -y || echo "⚠️  Warning: python3-apt installation failed"
+    
+    # Fix for apt_pkg module error
+    if ! sudo add-apt-repository universe -y; then
+        echo "⚠️  Warning: add-apt-repository failed, trying alternative method..."
+        # Ensure universe repository is enabled via direct method
+        sudo apt update
+        # Try to fix the apt_pkg module issue
+        if python3 -c "import apt_pkg" 2>/dev/null; then
+            echo "✅ apt_pkg module is working"
+            sudo add-apt-repository universe -y
+        else
+            echo "⚠️  Warning: apt_pkg module not available, using manual repository addition"
+            # Add universe repository manually
+            sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe" -y || true
+        fi
+    fi
+    
+    # Continue with setup even if repository addition had issues
+    echo "🔄 Continuing with package installation..."
+    
     sudo apt update && sudo apt install curl -y
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    
+    # Add ROS2 repository with error handling
+    ROS2_REPO_LINE="deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main"
+    if ! echo "$ROS2_REPO_LINE" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null; then
+        echo "⚠️  Warning: Failed to add ROS2 repository, trying alternative method..."
+        # Try alternative method to add ROS2 repository
+        sudo mkdir -p /etc/apt/sources.list.d
+        echo "$ROS2_REPO_LINE" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null || echo "⚠️  Warning: Failed to create ros2.list file"
+    fi
     
     # Install ROS2 packages
     sudo apt update
