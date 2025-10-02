@@ -28,18 +28,19 @@ import requests
 import subprocess
 import os
 import logging
+import uuid
 from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime, timedelta
 from enum import Enum
 
 # ROS2 message imports
 from std_msgs.msg import Header, String, Bool
-from sensor_msgs.msg import Audio, Image
+from sensor_msgs.msg import Image
 from elderly_companion.msg import (
-    SpeechResult, EmotionData, IntentResult, 
-    HealthStatus, EmergencyAlert, SafetyConstraints
+    SpeechResult, EmotionData, IntentResult,
+    HealthStatus, EmergencyAlert
 )
-from elderly_companion.srv import ProcessSpeech, ValidateIntent, ExecuteAction, EmergencyDispatch
+from elderly_companion.srv import ProcessSpeech
 
 
 class RouterAgentMode(Enum):
@@ -1073,8 +1074,9 @@ class EnhancedRouterAgentCoordinator(Node):
             }
             
             for component, service_name in ros2_services.items():
-                if service_name in [client._service_name for client in self.service_clients.values()]:
-                    # Service client exists, assume healthy
+                # Check if service client exists for this component
+                component_name = component.value.replace('_', '').lower()
+                if any(component_name in client_name for client_name in self.service_clients.keys()):
                     self.component_status[component.value] = True
                 else:
                     self.component_status[component.value] = False
@@ -1132,8 +1134,16 @@ class EnhancedRouterAgentCoordinator(Node):
             uptime = datetime.now() - self.system_metrics['system_uptime_start']
             self.system_metrics['uptime_seconds'] = uptime.total_seconds()
             
+            # Create JSON-serializable metrics
+            serializable_metrics = {}
+            for key, value in self.system_metrics.items():
+                if isinstance(value, datetime):
+                    serializable_metrics[key] = value.isoformat()
+                else:
+                    serializable_metrics[key] = value
+            
             metrics_msg = String()
-            metrics_msg.data = json.dumps(self.system_metrics)
+            metrics_msg.data = json.dumps(serializable_metrics)
             self.system_metrics_pub.publish(metrics_msg)
             
         except Exception as e:

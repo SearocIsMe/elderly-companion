@@ -168,28 +168,27 @@ class StructuredLLMEngine:
     def initialize_system_prompts(self) -> Dict[str, str]:
         """Initialize system prompts with constraints and schemas."""
         base_prompt = """你是老年陪伴机器人的意图解析系统。你必须将用户的自然语言输入转换为严格的JSON格式。
+            可用的意图类型和格式：
+            1. smart.home: {"intent": "smart.home", "device": "设备ID", "action": "动作", "room": "房间", "confirm": false}
+            2. call.emergency: {"intent": "call.emergency", "callee": "联系人", "reason": "原因", "confirm": true}
+            3. assist.move: {"intent": "assist.move", "target": "目标位置", "speed": "速度", "confirm": true}
+            4. media.play: {"intent": "media.play", "content_type": "内容类型", "mood": "心情", "confirm": false}
+            5. health.monitor: {"intent": "health.monitor", "check_type": "检查类型", "symptoms": "症状", "confirm": false}
 
-可用的意图类型和格式：
-1. smart.home: {"intent": "smart.home", "device": "设备ID", "action": "动作", "room": "房间", "confirm": false}
-2. call.emergency: {"intent": "call.emergency", "callee": "联系人", "reason": "原因", "confirm": true}
-3. assist.move: {"intent": "assist.move", "target": "目标位置", "speed": "速度", "confirm": true}
-4. media.play: {"intent": "media.play", "content_type": "内容类型", "mood": "心情", "confirm": false}
-5. health.monitor: {"intent": "health.monitor", "check_type": "检查类型", "symptoms": "症状", "confirm": false}
+            如果槽位信息不足，返回：{"need": "ask_clarification", "missing_fields": ["字段名"], "clarify_prompt": "请问..."}
 
-如果槽位信息不足，返回：{"need": "ask_clarification", "missing_fields": ["字段名"], "clarify_prompt": "请问..."}
+            约束条件：
+            {constraints}
 
-约束条件：
-{constraints}
+            用户输入：{user_input}
 
-用户输入：{user_input}
-
-只返回JSON，不要其他文字："""
+            只返回JSON，不要其他文字："""
 
         return {
             'intent_parsing': base_prompt,
             'clarification': """根据缺失信息生成简短的澄清问题。用户输入：{user_input}，缺失字段：{missing_fields}。
-            
-只返回JSON：{"clarify_prompt": "请问您要操作哪个房间的灯？", "suggested_options": ["客厅", "卧室", "厨房"]}"""
+                        
+            只返回JSON：{"clarify_prompt": "请问您要操作哪个房间的灯？", "suggested_options": ["客厅", "卧室", "厨房"]}"""
         }
     
     def initialize_llm_client(self):

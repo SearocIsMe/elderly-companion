@@ -56,7 +56,7 @@ def generate_launch_description():
     # Core Integration Nodes
     core_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='fastapi_bridge_node.py',
             name='fastapi_bridge_node',
             output='screen',
@@ -66,7 +66,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='enhanced_router_coordinator.py',
             name='enhanced_router_coordinator',
             output='screen',
@@ -81,7 +81,7 @@ def generate_launch_description():
     # Audio Pipeline Nodes
     audio_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='silero_vad_node.py',
             name='silero_vad_node',
             output='screen',
@@ -92,7 +92,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='speech_recognition_node.py',
             name='speech_recognition_node',
             output='screen',
@@ -103,7 +103,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='enhanced_tts_engine_node.py',
             name='enhanced_tts_engine_node',
             output='screen',
@@ -114,7 +114,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='emotion_analyzer_node.py',
             name='emotion_analyzer_node',
             output='screen',
@@ -128,7 +128,7 @@ def generate_launch_description():
     # Safety and Guard Nodes
     safety_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='enhanced_guard_engine.py',
             name='enhanced_guard_engine',
             output='screen',
@@ -140,7 +140,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='guard_fastapi_bridge_node.py',
             name='guard_fastapi_bridge_node',
             output='screen',
@@ -151,7 +151,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='safety_guard_node.py',
             name='safety_guard_node',
             output='screen',
@@ -165,7 +165,7 @@ def generate_launch_description():
     # Communication Nodes
     communication_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='sip_voip_adapter_node.py',
             name='sip_voip_adapter_node',
             output='screen',
@@ -176,7 +176,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='dialog_manager_node.py',
             name='dialog_manager_node',
             output='screen',
@@ -189,7 +189,7 @@ def generate_launch_description():
     # Smart Home Nodes
     smart_home_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='smart_home_backend_node.py',
             name='smart_home_backend_node',
             output='screen',
@@ -200,7 +200,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='mqtt_adapter_node.py',
             name='mqtt_adapter_node',
             output='screen',
@@ -214,7 +214,7 @@ def generate_launch_description():
     # Video Streaming Nodes
     video_nodes = [
         Node(
-            package='router_agent',
+            package='elderly_companion',
             executable='webrtc_uplink_node.py',
             name='webrtc_uplink_node',
             output='screen',

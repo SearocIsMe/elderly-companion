@@ -1,22 +1,5 @@
-# Validate Intent Service
-# Used by the Safety Guard to validate and approve intents before execution
-
-# Request
-IntentResult intent                    # The intent to validate
-HealthStatus system_status            # Current system health status
-SafetyConstraints safety_constraints  # Current safety constraints
-string user_context                   # Additional context about the user
-bool emergency_override               # Whether this is an emergency override request
-
+string intent_type
+string text
 ---
-
-# Response
-bool approved                         # Whether the intent is approved for execution
-string rejection_reason               # Reason for rejection (if not approved)
-string[] safety_constraints_violated  # List of safety constraints that would be violated
-int32 priority_level                  # Assigned priority level (0=low, 3=critical)
-float32 confidence_adjustment         # Suggested confidence adjustment (-1.0 to 1.0)
-bool requires_human_confirmation      # Whether human confirmation is needed
-string[] alternative_suggestions      # Alternative safe actions to suggest
-int32 estimated_risk_level           # Risk assessment (0=no risk, 10=high risk)
-SafetyConstraints updated_constraints # Updated safety constraints if needed
+bool validation_passed
+string validation_reason

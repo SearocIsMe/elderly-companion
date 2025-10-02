@@ -1,31 +1,144 @@
-# Simple Chat Loop Requirements
-# Basic dependencies for microphone-speaker chat functionality
+# Enhanced Elderly Companion Robot - Python Dependencies
+# Complete list of Python packages required for the system
 
-# Core dependencies (always required)
-speechrecognition==3.10.0
-pyttsx3==2.90
-numpy==1.24.3
+# ============================================================================
+# CORE DEPENDENCIES (Essential for basic functionality)
+# ============================================================================
 
-# Audio processing (install system dependencies first - see SIMPLE_SETUP.md)
-# Uncomment after installing system audio libraries:
-# pyaudio==0.2.11
-# sounddevice==0.4.6
+# Web framework and API (FastAPI Services)
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+httpx>=0.25.0
+requests>=2.31.0
 
-# Alternative audio libraries (if pyaudio fails)
-# soundfile==0.12.1
-# librosa==0.10.1
+# Basic data processing and utilities
+numpy>=1.23.5
+scipy>=1.11.0
+pyyaml>=6.0.0
+python-dotenv>=1.0.0
 
-# Optional: For better speech recognition (requires internet)
-# google-cloud-speech==2.21.0
-
-# Platform-specific installation notes:
-# See SIMPLE_SETUP.md for detailed system dependency installation
-
-# Install all essential ROS2 Python packages:
-empy==3.3.4
-catkin_pkg 
+# ROS2 Python dependencies
+empy>=3.3.4
+catkin_pkg
 lark
-setuptools 
+setuptools
 wheel
-pyyaml
 argcomplete
+
+# ============================================================================
+# AUDIO PROCESSING DEPENDENCIES
+# ============================================================================
+
+# Basic speech recognition and TTS
+speechrecognition>=3.10.0
+pyttsx3>=2.90
+
+# Audio file handling and processing
+soundfile>=0.12.0
+librosa>=0.10.0
+
+# Real-time audio (requires system portaudio19-dev)
+# Install system deps first: sudo apt install portaudio19-dev python3-dev
+pyaudio>=0.2.11
+
+# Alternative audio libraries
+sounddevice>=0.4.6
+
+# ============================================================================
+# AI AND MACHINE LEARNING DEPENDENCIES  
+# ============================================================================
+
+# Language models and transformers
+torch>=2.0.0
+transformers>=4.30.0
+huggingface_hub>=0.16.0
+
+# Traditional ML
+scikit-learn>=1.3.0
+pandas>=2.0.0
+
+# ============================================================================
+# COMMUNICATION AND NETWORKING
+# ============================================================================
+
+# Real-time communication
+websockets>=11.0.0
+python-socketio>=5.8.0
+
+# MQTT for smart home integration
+paho-mqtt>=1.6.0
+
+# SIP/VoIP communication (requires system pjproject-dev)
+# Install system deps first: sudo apt install libpjproject-dev
+# pjsua2  # Uncomment after installing system dependencies
+
+# ============================================================================
+# COMPUTER VISION AND VIDEO
+# ============================================================================
+
+# Image and video processing
+opencv-python>=4.8.0
+pillow>=10.0.0
+
+# ============================================================================
+# DATABASE AND PERSISTENCE (Optional for advanced features)
+# ============================================================================
+
+# Database ORM and migrations
+sqlalchemy>=2.0.0
+alembic>=1.11.0
+
+# PostgreSQL adapter (for production deployments)
+# psycopg2-binary>=2.9.0  # Uncomment for production with PostgreSQL
+
+# ============================================================================
+# UTILITIES AND HELPERS
+# ============================================================================
+
+# CLI and logging
+click>=8.1.0
+rich>=13.0.0
+loguru>=0.7.0
+
+# ============================================================================
+# DEVELOPMENT AND TESTING (Optional)
+# ============================================================================
+
+# Testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Code formatting and linting
+black>=23.0.0
+flake8>=6.0.0
+
+# ============================================================================
+# DEPLOYMENT DEPENDENCIES (Optional)
+# ============================================================================
+
+# Docker support
+docker>=6.0.0
+
+# Process management for production
+supervisor>=4.2.0
+
+# ============================================================================
+# INSTALLATION NOTES
+# ============================================================================
+
+# SYSTEM DEPENDENCIES REQUIRED:
+# See SIMPLE_SETUP.md for complete system dependency installation instructions
+#
+# Essential system packages:
+# - portaudio19-dev (for pyaudio)
+# - python3-dev build-essential (for compilation)
+# - libpjproject-dev (for SIP/VoIP, optional)
+# - docker.io docker-compose (for FastAPI services)
+# - ros-humble-desktop (for ROS2)
+#
+# Install order:
+# 1. Install system dependencies (see SIMPLE_SETUP.md)
+# 2. pip install -r requirements.txt
+# 3. Build ROS2 workspace: colcon build
+# 4. Launch system: ./scripts/launch.sh

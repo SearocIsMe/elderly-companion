@@ -15,6 +15,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
@@ -23,19 +25,26 @@ set(msg_files
   "msg/EmotionData.msg"
   "msg/SpeechResult.msg"
   "msg/IntentResult.msg"
+  "msg/EmergencyAlert.msg"
+  "msg/HealthStatus.msg"
 )
 
 set(srv_files
   "srv/ProcessSpeech.srv"
+  "srv/ValidateIntent.srv"
+  "srv/ExecuteAction.srv"
+  "srv/EmergencyDispatch.srv"
 )
 
-# Generate interfaces with minimal dependencies
+# Generate interfaces with complete dependencies
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
   ${srv_files}
   DEPENDENCIES
     builtin_interfaces
     std_msgs
+    sensor_msgs
+    geometry_msgs
 )
 
 # Install Python nodes for Router Agent architecture - Enhanced Integration
