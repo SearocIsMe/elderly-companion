@@ -104,13 +104,13 @@ ros2 pkg list | grep elderly_companion
 ### Step 3: Configure Docker Development
 ```bash
 # Build development container
-docker-compose build ros2-dev
+docker compose build ros2-dev
 
 # Start development environment
-docker-compose up -d
+docker compose up -d
 
 # Verify container
-docker-compose ps
+docker compose ps
 ```
 
 ### Step 4: Test Development Setup

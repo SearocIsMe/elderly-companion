@@ -405,7 +405,7 @@ class EnhancedRouterAgentCoordinator(Node):
             if docker_compose_file and os.path.exists(docker_compose_file):
                 # Start FastAPI services
                 result = subprocess.run([
-                    'docker-compose', '-f', docker_compose_file, 'up', '-d'
+                    'docker', 'compose', '-f', docker_compose_file, 'up', '-d'
                 ], capture_output=True, text=True, cwd=os.path.dirname(docker_compose_file))
                 
                 if result.returncode == 0:
