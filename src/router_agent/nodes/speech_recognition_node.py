@@ -108,7 +108,7 @@ class SpeechRecognitionNode(Node):
         }
         
         self.get_logger().info("Speech Recognition Node initialized successfully")
-
+        
     def initialize_asr_model(self):
         """Initialize the sherpa-onnx ASR model."""
         try:
@@ -120,7 +120,7 @@ class SpeechRecognitionNode(Node):
                 # CPU configuration for development
                 config = self.create_cpu_config()
             
-            # Create recognizer
+            # Create recognizer - 使用配置对象
             self.recognizer = sherpa_onnx.OnlineRecognizer(config)
             
             # Test the model
@@ -136,37 +136,35 @@ class SpeechRecognitionNode(Node):
 
     def create_rknpu_config(self):
         """Create RKNPU-optimized configuration for RK3588."""
-        try:
-            config = sherpa_onnx.OnlineRecognizerConfig(
-                feat_config=sherpa_onnx.FeatureConfig(
-                    sample_rate=self.sample_rate,
-                    feature_dim=80,
+        # 根据实际文件名调整配置
+        config = sherpa_onnx.OnlineRecognizerConfig(
+            feat_config=sherpa_onnx.FeatureConfig(
+                sample_rate=self.sample_rate,
+                feature_dim=80,
+            ),
+            model_config=sherpa_onnx.OnlineModelConfig(
+                transducer=sherpa_onnx.OnlineTransducerModelConfig(
+                    encoder_filename=os.path.join(self.model_path, "encoder-epoch-34-avg-19.onnx"),
+                    decoder_filename=os.path.join(self.model_path, "decoder-epoch-34-avg-19.onnx"),
+                    joiner_filename=os.path.join(self.model_path, "joiner-epoch-34-avg-19.onnx"),
                 ),
-                model_config=sherpa_onnx.OnlineModelConfig(
-                    transducer=sherpa_onnx.OnlineTransducerModelConfig(
-                        encoder_filename=os.path.join(self.model_path, "encoder.rknn"),
-                        decoder_filename=os.path.join(self.model_path, "decoder.rknn"),
-                        joiner_filename=os.path.join(self.model_path, "joiner.rknn"),
-                    ),
-                    tokens=os.path.join(self.model_path, "tokens.txt"),
-                    provider="rknpu",
-                    model_type="transducer",
-                    modeling_unit="cjkchar",
-                    bpe_vocab="",
-                ),
-                decoder_config=sherpa_onnx.OnlineRecognizerDecoderConfig(
-                    decoding_method="greedy_search",
-                    max_active_paths=4,
-                ),
-                enable_endpoint=True,
+                tokens=os.path.join(self.model_path, "tokens.txt"),
+                provider="cpu",  # 暂时没有.rknn文件
+                model_type="transducer",
+                modeling_unit="cjkchar",
+            ),
+            decoder_config=sherpa_onnx.OnlineRecognizerDecoderConfig(
+                decoding_method="greedy_search",
+                max_active_paths=4,
+            ),
+            endpoint_config=sherpa_onnx.EndpointConfig(
                 rule1_min_trailing_silence=2.4,
                 rule2_min_trailing_silence=1.2,
                 rule3_min_utterance_length=300,
-            )
-            return config
-        except AttributeError:
-            # 回退到旧版本API
-            return self.create_old_api_config()
+            ),
+            enable_endpoint=True,
+        )
+        return config
 
     def create_cpu_config(self):
         """Create CPU configuration for development."""
@@ -177,9 +175,9 @@ class SpeechRecognitionNode(Node):
             ),
             model_config=sherpa_onnx.OnlineModelConfig(
                 transducer=sherpa_onnx.OnlineTransducerModelConfig(
-                    encoder_filename=os.path.join(self.model_path, "encoder.onnx"),
-                    decoder_filename=os.path.join(self.model_path, "decoder.onnx"),
-                    joiner_filename=os.path.join(self.model_path, "joiner.onnx"),
+                    encoder_filename=os.path.join(self.model_path, "encoder-epoch-34-avg-19.onnx"),
+                    decoder_filename=os.path.join(self.model_path, "decoder-epoch-34-avg-19.onnx"),
+                    joiner_filename=os.path.join(self.model_path, "joiner-epoch-34-avg-19.onnx"),
                 ),
                 tokens=os.path.join(self.model_path, "tokens.txt"),
                 provider="cpu",
@@ -190,15 +188,46 @@ class SpeechRecognitionNode(Node):
                 decoding_method="greedy_search",
                 max_active_paths=4,
             ),
+            endpoint_config=sherpa_onnx.EndpointConfig(
+                rule1_min_trailing_silence=2.4,
+                rule2_min_trailing_silence=1.2,
+                rule3_min_utterance_length=20.0,
+            ),
             enable_endpoint=True,
         )
         return config
 
     def initialize_fallback_model(self):
-        """Initialize a fallback model for testing."""
-        self.get_logger().warning("Using fallback speech recognition model")
-        # Create a mock recognizer for development
-        self.recognizer = None
+        """Fallback configuration if primary initialization fails."""
+        try:
+            self.get_logger().warn("Initializing fallback ASR model...")
+            config = sherpa_onnx.OnlineRecognizerConfig(
+                feat_config=sherpa_onnx.FeatureConfig(
+                    sample_rate=16000,
+                    feature_dim=80,
+                ),
+                model_config=sherpa_onnx.OnlineModelConfig(
+                    transducer=sherpa_onnx.OnlineTransducerModelConfig(
+                        encoder_filename=os.path.join(self.model_path, "encoder-epoch-34-avg-19.onnx"),
+                        decoder_filename=os.path.join(self.model_path, "decoder-epoch-34-avg-19.onnx"),
+                        joiner_filename=os.path.join(self.model_path, "joiner-epoch-34-avg-19.onnx"),
+                    ),
+                    tokens=os.path.join(self.model_path, "tokens.txt"),
+                    provider="cpu",
+                    model_type="transducer",
+                    modeling_unit="cjkchar",
+                ),
+                decoder_config=sherpa_onnx.OnlineRecognizerDecoderConfig(
+                    decoding_method="greedy_search",
+                    max_active_paths=4,
+                ),
+            )
+            self.recognizer = sherpa_onnx.OnlineRecognizer(config)
+            self.get_logger().info("Fallback ASR model initialized successfully")
+        except Exception as e:
+            self.get_logger().error(f"Fallback model also failed: {e}")
+            raise
+
 
     def process_audio_callback(self, msg):
         """Process incoming audio messages."""

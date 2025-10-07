@@ -252,6 +252,13 @@ sudo python3 -m pip install --force-reinstall --no-deps sympy==1.12
 
 ## 6. Build Application
 
+### model download and install
+
+```
+download https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-zh-en-2023-11-22.tar.bz2 from https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models
+and extract into /models//sherpa-onnx-zipformer-zh-en-2023-11-22/sherpa-onnx/
+```
+
 ### 6.1 Build ROS2 Workspace
 
 ```bash
