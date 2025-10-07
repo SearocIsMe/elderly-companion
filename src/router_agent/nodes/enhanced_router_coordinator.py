@@ -20,6 +20,15 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from rclpy.executors import MultiThreadedExecutor
 
+# 需要正确导入服务消息类型
+# 需要正确导入服务消息类型
+from elderly_companion.srv import (
+    ValidateIntent,
+    ExecuteAction,      # 添加这一行
+    EmergencyDispatch   # 添加这一行
+)
+
+
 import json
 import time
 import threading
@@ -422,19 +431,32 @@ class EnhancedRouterAgentCoordinator(Node):
     def get_docker_compose_file(self) -> Optional[str]:
         """Get appropriate Docker compose file based on deployment target."""
         try:
-            base_path = os.path.join(
-                os.path.dirname(__file__), 
-                '../../router_agent/docker'
-            )
+            # 直接使用固定的源码路径，避免复杂的相对路径计算
+            base_path = "/mnt/c/Users/haipeng/Documents/00-code/02-RobDog/elderly-companion/src/router_agent/docker"
             
-            if self.deployment_target == 'rk3588':
-                return os.path.join(base_path, 'docker-compose.rk3588.yml')
-            elif self.deployment_target == 'production':
-                return os.path.join(base_path, 'docker-compose.pc.gpu.yml')
-            else:
-                return os.path.join(base_path, 'docker-compose.pc.yml')
+            # 检查目录是否存在
+            if not os.path.exists(base_path):
+                self.get_logger().warning(f"Docker directory not found: {base_path}")
+                return None
                 
-        except Exception:
+            # 根据部署目标选择文件
+            if self.deployment_target == 'rk3588':
+                file_path = os.path.join(base_path, 'docker-compose.rk3588.yml')
+            elif self.deployment_target == 'production':
+                file_path = os.path.join(base_path, 'docker-compose.pc.gpu.yml')
+            else:
+                file_path = os.path.join(base_path, 'docker-compose.pc.yml')
+                
+            # 检查文件是否存在
+            if os.path.exists(file_path):
+                self.get_logger().info(f"Found Docker compose file: {file_path}")
+                return file_path
+            else:
+                self.get_logger().warning(f"Docker compose file not found: {file_path}")
+                return None
+                
+        except Exception as e:
+            self.get_logger().error(f"Error finding docker compose file: {e}")
             return None
 
     def wait_for_essential_components(self):
@@ -788,6 +810,7 @@ class EnhancedRouterAgentCoordinator(Node):
             
         except Exception as e:
             self.get_logger().error(f"Text input handling error: {e}")
+
 
     def handle_fastapi_response(self, msg: String):
         """Handle response from FastAPI bridge."""

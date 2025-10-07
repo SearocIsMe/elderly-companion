@@ -38,7 +38,7 @@ except ImportError:
     print("Warning: scipy/librosa not available, limited audio processing")
 
 # ROS2 message imports
-from sensor_msgs.msg import Audio
+#from audio_common_msgs.msg import AudioData
 from std_msgs.msg import Header, Bool
 from elderly_companion.msg import SpeechResult, EmotionData
 
@@ -257,19 +257,19 @@ class SileroVADNode(Node):
         
         # Publishers
         self.raw_audio_pub = self.create_publisher(
-            Audio,
+            Header,
             '/audio/raw_stream',
             realtime_qos
         )
         
         self.processed_audio_pub = self.create_publisher(
-            Audio,
+            Header,
             '/audio/processed_stream',
             realtime_qos
         )
         
         self.speech_segments_pub = self.create_publisher(
-            Audio,
+            Header,
             '/audio/speech_segments',
             reliable_qos
         )
@@ -590,7 +590,7 @@ class SileroVADNode(Node):
     def publish_raw_audio(self, audio_data: np.ndarray, timestamp: float):
         """Publish raw audio data."""
         try:
-            audio_msg = Audio()
+            audio_msg = Header()
             audio_msg.header = Header()
             audio_msg.header.stamp = self.get_clock().now().to_msg()
             audio_msg.header.frame_id = "audio_input"
@@ -608,7 +608,6 @@ class SileroVADNode(Node):
     def publish_processed_audio(self, audio_data: np.ndarray, timestamp: float):
         """Publish processed audio data."""
         try:
-            audio_msg = Audio()
             audio_msg.header = Header()
             audio_msg.header.stamp = self.get_clock().now().to_msg()
             audio_msg.header.frame_id = "audio_processed"
@@ -631,7 +630,6 @@ class SileroVADNode(Node):
             
             audio_array = np.array(speech_buffer, dtype=np.float32)
             
-            audio_msg = Audio()
             audio_msg.header = Header()
             audio_msg.header.stamp = self.get_clock().now().to_msg()
             audio_msg.header.frame_id = "speech_segment"

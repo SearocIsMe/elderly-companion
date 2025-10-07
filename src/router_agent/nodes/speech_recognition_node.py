@@ -21,7 +21,7 @@ import soundfile as sf
 import tempfile
 
 # ROS2 message imports
-from sensor_msgs.msg import Audio
+#from audio_common_msgs.msg import AudioData
 from std_msgs.msg import Header
 from elderly_companion.msg import SpeechResult, EmotionData
 from elderly_companion.srv import ProcessSpeech
@@ -41,7 +41,7 @@ class SpeechRecognitionNode(Node):
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('asr.model_path', '/models/sherpa-onnx/chinese-english'),
+                ('asr.model_path', '/models/sherpa-onnx-zipformer-zh-en-2023-11-22/sherpa-onnx'),
                 ('asr.language', 'zh-CN'),
                 ('asr.sample_rate', 16000),
                 ('asr.use_rknpu', True),
@@ -74,7 +74,7 @@ class SpeechRecognitionNode(Node):
         
         # Subscribers
         self.audio_sub = self.create_subscription(
-            Audio,
+            Header,
             '/audio/speech_segments',
             self.process_audio_callback,
             default_qos
@@ -136,33 +136,37 @@ class SpeechRecognitionNode(Node):
 
     def create_rknpu_config(self):
         """Create RKNPU-optimized configuration for RK3588."""
-        config = sherpa_onnx.OnlineRecognizerConfig(
-            feat_config=sherpa_onnx.FeatureConfig(
-                sample_rate=self.sample_rate,
-                feature_dim=80,
-            ),
-            model_config=sherpa_onnx.OnlineModelConfig(
-                transducer=sherpa_onnx.OnlineTransducerModelConfig(
-                    encoder_filename=os.path.join(self.model_path, "encoder.rknn"),
-                    decoder_filename=os.path.join(self.model_path, "decoder.rknn"),
-                    joiner_filename=os.path.join(self.model_path, "joiner.rknn"),
+        try:
+            config = sherpa_onnx.OnlineRecognizerConfig(
+                feat_config=sherpa_onnx.FeatureConfig(
+                    sample_rate=self.sample_rate,
+                    feature_dim=80,
                 ),
-                tokens=os.path.join(self.model_path, "tokens.txt"),
-                provider="rknpu",
-                model_type="transducer",
-                modeling_unit="cjkchar",
-                bpe_vocab="",
-            ),
-            decoder_config=sherpa_onnx.OnlineRecognizerDecoderConfig(
-                decoding_method="greedy_search",
-                max_active_paths=4,
-            ),
-            enable_endpoint=True,
-            rule1_min_trailing_silence=2.4,
-            rule2_min_trailing_silence=1.2,
-            rule3_min_utterance_length=300,
-        )
-        return config
+                model_config=sherpa_onnx.OnlineModelConfig(
+                    transducer=sherpa_onnx.OnlineTransducerModelConfig(
+                        encoder_filename=os.path.join(self.model_path, "encoder.rknn"),
+                        decoder_filename=os.path.join(self.model_path, "decoder.rknn"),
+                        joiner_filename=os.path.join(self.model_path, "joiner.rknn"),
+                    ),
+                    tokens=os.path.join(self.model_path, "tokens.txt"),
+                    provider="rknpu",
+                    model_type="transducer",
+                    modeling_unit="cjkchar",
+                    bpe_vocab="",
+                ),
+                decoder_config=sherpa_onnx.OnlineRecognizerDecoderConfig(
+                    decoding_method="greedy_search",
+                    max_active_paths=4,
+                ),
+                enable_endpoint=True,
+                rule1_min_trailing_silence=2.4,
+                rule2_min_trailing_silence=1.2,
+                rule3_min_utterance_length=300,
+            )
+            return config
+        except AttributeError:
+            # 回退到旧版本API
+            return self.create_old_api_config()
 
     def create_cpu_config(self):
         """Create CPU configuration for development."""
@@ -196,7 +200,7 @@ class SpeechRecognitionNode(Node):
         # Create a mock recognizer for development
         self.recognizer = None
 
-    def process_audio_callback(self, msg: Audio):
+    def process_audio_callback(self, msg):
         """Process incoming audio messages."""
         try:
             self.get_logger().debug("Received audio for speech recognition")

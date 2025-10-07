@@ -203,7 +203,24 @@ sudo python3 -m pip install \
 
 ### 5.2 Install All Dependencies
 
+** Install the torchaudio in conda and system **
+```
+# Ubuntu/Debian系统
+sudo apt update
+sudo apt install python3-torchaudio
+
+# 或者使用conda（如果您使用conda环境）
+conda install -c pytorch torchaudio
+
+```
+
 ```bash
+
+# 安装TTS相关依赖
+sudo apt install -y espeak espeak-ng
+pip install pyttsx3
+
+
 # Install all dependencies from requirements.txt (with conflict resolution)
 sudo python3 -m pip install -r requirements.txt --ignore-installed
 
@@ -270,9 +287,9 @@ source install/setup.bash
 source install/setup.bash
 
 # 2. Start FastAPI services
-cd src/router_agent/router_agent/docker
+cd src/router_agent/docker
 docker compose -f docker-compose.pc.yml up -d
-cd ../../../..
+cd ../../..
 
 # 3. Verify services
 curl http://localhost:7010/health  # Orchestrator
@@ -303,7 +320,7 @@ sudo systemctl status elderly-companion-router-agent.service
 
 ```bash
 # Use production Docker compose
-cd src/router_agent/router_agent/docker
+cd src/router_agent/docker
 docker compose -f docker-compose.pc.gpu.yml up -d
 
 # Or for full production

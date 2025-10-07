@@ -60,7 +60,7 @@ import requests
 
 # ROS2 message imports
 from std_msgs.msg import String, Bool, Header
-from sensor_msgs.msg import Audio
+#from audio_common_msgs.msg import AudioData
 from elderly_companion.msg import EmotionData
 
 
@@ -291,7 +291,7 @@ class EnhancedTTSEngineNode(Node):
         )
         
         self.audio_output_pub = self.create_publisher(
-            Audio,
+            Header,
             '/audio/tts_output',
             default_qos
         )

@@ -21,7 +21,7 @@ from typing import Optional, Dict, List, Tuple, Any
 import json
 
 # ROS2 message imports
-from sensor_msgs.msg import Audio
+
 from std_msgs.msg import Header
 from elderly_companion.msg import SpeechResult, EmotionData
 
@@ -106,7 +106,7 @@ class EmotionAnalyzerNode(Node):
         )
         
         self.raw_audio_sub = self.create_subscription(
-            Audio,
+            Header,
             '/audio/raw',
             self.analyze_audio_features_callback,
             default_qos
@@ -407,7 +407,7 @@ class EmotionAnalyzerNode(Node):
             emotion_data.valence = 0.0
             emotion_data.arousal = 0.3
 
-    def analyze_audio_features_callback(self, msg: Audio):
+    def analyze_audio_features_callback(self, msg):
         """Analyze emotion from audio features."""
         try:
             # Extract audio data

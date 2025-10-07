@@ -27,6 +27,7 @@ set(msg_files
   "msg/IntentResult.msg"
   "msg/EmergencyAlert.msg"
   "msg/HealthStatus.msg"
+  "msg/SafetyConstraints.msg"  # 添加这一行
 )
 
 set(srv_files

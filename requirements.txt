@@ -13,7 +13,7 @@ httpx>=0.25.0
 requests>=2.31.0
 
 # Basic data processing and utilities
-numpy>=1.23.5
+numpy>=1.24.3
 scipy>=1.11.0
 pyyaml>=6.0.0
 python-dotenv>=1.0.0
@@ -142,3 +142,5 @@ supervisor>=4.2.0
 # 2. pip install -r requirements.txt
 # 3. Build ROS2 workspace: colcon build
 # 4. Launch system: ./scripts/launch.sh
+onnxruntime
+onnx

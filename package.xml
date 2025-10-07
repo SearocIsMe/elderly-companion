@@ -36,6 +36,11 @@
   
   <!-- Communication Dependencies -->
   <depend>rosbridge_library</depend>
+
+  <!-- 在package.xml中添加 -->
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+
   
   <!-- Development Dependencies -->
   <test_depend>ament_lint_auto</test_depend>
