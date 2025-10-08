@@ -37,6 +37,15 @@ A comprehensive guide from git clone to deployment and testing.
 
 ## 2. Environment Setup
 
+```
+python3 -m venv ~/venvs/robdog
+source ~/venvs/robdog/bin/activate
+pip install -U pip
+
+pip install cmake
+
+```
+
 ### 2.1 Install ROS2 Humble
 
 ```bash
@@ -145,9 +154,6 @@ sudo apt install -y \
     python3-opencv \
     libgtk-3-dev
 ```
-
----
-
 ## 4. Code Setup
 
 ### 4.1 Clone Repository
@@ -159,6 +165,7 @@ cd elderly-companion
 
 # Verify project structure
 tree -L 2
+
 ```
 
 ### 4.2 Handle Conda Conflicts (Important!)
@@ -209,9 +216,6 @@ sudo python3 -m pip install \
 sudo apt update
 sudo apt install python3-torchaudio
 
-# 或者使用conda（如果您使用conda环境）
-conda install -c pytorch torchaudio
-
 ```
 
 ```bash
@@ -254,10 +258,7 @@ sudo python3 -m pip install --force-reinstall --no-deps sympy==1.12
 
 ### model download and install
 
-```
-download https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-zh-en-2023-11-22.tar.bz2 from https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models
-and extract into /models//sherpa-onnx-zipformer-zh-en-2023-11-22/sherpa-onnx/
-```
+the model download scripts are depicted in [model readme.md](./tools/readme.md)
 
 ### 6.1 Build ROS2 Workspace
 

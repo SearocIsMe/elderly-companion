@@ -1,0 +1,30 @@
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /home/lindows/anaconda3/envs/elder
+
+  added / updated specs:
+    - libstdcxx-ng
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    ca-certificates-2025.10.5  |       hbd8a1cb_0         152 KB  conda-forge
+    certifi-2025.10.5          |     pyhd8ed1ab_0         156 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:         309 KB
+
+The following packages will be UPDATED:
+
+  ca-certificates    pkgs/main/linux-64::ca-certificates-2~ --> conda-forge/noarch::ca-certificates-2025.10.5-hbd8a1cb_0 
+
+The following packages will be SUPERSEDED by a higher-priority channel:
+
+  certifi            pkgs/main/linux-64::certifi-2025.10.5~ --> conda-forge/noarch::certifi-2025.10.5-pyhd8ed1ab_0 
+
+
+Proceed ([y]/n)? 

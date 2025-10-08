@@ -4,17 +4,19 @@
   <name>elderly_companion</name>
   <version>0.1.0</version>
   <description>Elderly Companion Robdog - A comprehensive elderly care robotics system</description>
-  
+
   <maintainer email="dev@elderly-companion.com">Elderly Companion Team</maintainer>
   <license>MIT</license>
-  
+
   <url type="website">https://github.com/elderly-companion/robdog</url>
   <url type="bugtracker">https://github.com/elderly-companion/robdog/issues</url>
   <url type="repository">https://github.com/elderly-companion/robdog</url>
-  
+
+  <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>
-  
-  <!-- Core ROS2 Dependencies -->
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- Core ROS2 -->
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
@@ -23,34 +25,44 @@
   <depend>nav_msgs</depend>
   <depend>action_msgs</depend>
   <depend>builtin_interfaces</depend>
-  
-  <!-- Navigation Dependencies -->
-  <depend>nav2_common</depend>
-  <depend>nav2_msgs</depend>
+
+  <!-- TF / Nav -->
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
-  
-  <!-- Audio/Media Dependencies -->
-  <!-- Audio dependencies will be handled via custom message definitions when needed -->
-  
-  <!-- Communication Dependencies -->
+  <depend>nav2_common</depend>
+  <depend>nav2_msgs</depend>
+
+  <!-- Comm / Bridge -->
   <depend>rosbridge_library</depend>
 
-  <!-- 在package.xml中添加 -->
-  <depend>message_generation</depend>
-  <depend>message_runtime</depend>
+  <!-- 如果你这个包内定义了自定义消息，请用 ROS2 规范： -->
+  <!-- 生成接口 -->
+  <build_depend>rosidl_default_generators</build_depend>
+  <!-- 运行时依赖 -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
 
-  
-  <!-- Development Dependencies -->
+  <!-- 如果自定义消息拆分在单独包 elderly_companion_msgs，这里保持依赖： -->
+  <!-- <depend>elderly_companion_msgs</depend> -->
+
+  <!-- Python 运行时依赖（按需裁剪） -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-scipy</exec_depend>
+  <exec_depend>python3-soundfile</exec_depend>
+  <exec_depend>python3-paho-mqtt</exec_depend>
+  <!-- 如需 onnx/sherpa-onnx，可在环境中安装，不强制写入 package.xml：
+       pip install sherpa-onnx==1.12.14 -->
+
+  <!-- Dev / Test -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_pytest</test_depend>
-  
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-  
+
+  <!-- 若本包包含接口声明，则保留该分组 -->
   <member_of_group>rosidl_interface_packages</member_of_group>
 </package>

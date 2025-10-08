@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 """
-Enhanced Elderly Companion Complete System Launch File.
+Enhanced Elderly Companion Complete System Launch File (merged).
 
-Launches the complete integrated elderly companion system with:
-- Audio Pipeline: Silero VAD → ASR → Emotion Analysis → Enhanced Guard  
-- Core Logic: FastAPI Services (Guard → Intent → Orchestrator → Adapters)
-- Communication: SIP/VoIP Emergency Calling + SMS/Email Notifications
-- Smart Home: MQTT/Home Assistant Integration + Elderly Care Automation
-- Video: WebRTC Streaming to Family Frontend
-- Safety: Advanced Guard Engine + Emergency Response Protocols
-- Output: Enhanced TTS with Elderly Optimization
+- 保留你原有的系统分层与分组启动（Core/Audio/Safety/Comm/SmartHome/Video）
+- 对接我们前面稳定化后的节点与参数：
+  * silero_vad_node.py：订阅 /audio/raw_stream_in（ByteMultiArray, float32 PCM bytes）
+                        发布 /audio/processed_stream、/audio/speech_segments
+  * speech_recognition_node.py：订阅 /audio/speech_segments，发布 /speech/recognized
+  * enhanced_guard_engine.py：订阅 /speech/recognized，发布 /guard/events
+- 统一常用参数，便于 PC 与 RK3588 两端跑通
 """
 
 import os
 from launch import LaunchDescription
 from launch.actions import (
-    DeclareLaunchArgument, 
-    ExecuteProcess, 
-    GroupAction,
+    DeclareLaunchArgument,
     LogInfo,
-    TimerAction
+    TimerAction,
 )
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
@@ -27,22 +24,23 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Generate launch description for complete elderly companion system."""
-    
-    # Launch arguments
+    # ----- Launch args -----
     launch_args = [
         DeclareLaunchArgument('mode', default_value='hybrid', description='Operation mode'),
-        DeclareLaunchArgument('deployment_target', default_value='development', description='Deployment target'),
-        DeclareLaunchArgument('enable_fastapi_services', default_value='true', description='Enable FastAPI services'),
-        DeclareLaunchArgument('enable_audio_pipeline', default_value='true', description='Enable audio pipeline'),
-        DeclareLaunchArgument('enable_safety_systems', default_value='true', description='Enable safety systems'),
-        DeclareLaunchArgument('enable_emergency_services', default_value='true', description='Enable emergency services'),
-        DeclareLaunchArgument('enable_smart_home', default_value='true', description='Enable smart home'),
-        DeclareLaunchArgument('enable_video_streaming', default_value='true', description='Enable video streaming'),
-        DeclareLaunchArgument('log_level', default_value='INFO', description='Log level')
+        DeclareLaunchArgument('deployment_target', default_value='development', description='Target: development|rk3588'),
+        DeclareLaunchArgument('enable_fastapi_services', default_value='true'),
+        DeclareLaunchArgument('enable_audio_pipeline', default_value='true'),
+        DeclareLaunchArgument('enable_safety_systems', default_value='true'),
+        DeclareLaunchArgument('enable_emergency_services', default_value='true'),
+        DeclareLaunchArgument('enable_smart_home', default_value='true'),
+        DeclareLaunchArgument('enable_video_streaming', default_value='true'),
+        DeclareLaunchArgument('log_level', default_value='INFO'),
+        # 音频与ASR常用参数
+        DeclareLaunchArgument('audio_sample_rate', default_value='16000'),
+        DeclareLaunchArgument('asr_model_path', default_value='/models/asr-zip-zh-en'),
     ]
-    
-    # Get configurations
+
+    # ----- Config -----
     mode = LaunchConfiguration('mode')
     deployment_target = LaunchConfiguration('deployment_target')
     enable_fastapi = LaunchConfiguration('enable_fastapi_services')
@@ -52,8 +50,11 @@ def generate_launch_description():
     enable_smart_home = LaunchConfiguration('enable_smart_home')
     enable_video = LaunchConfiguration('enable_video_streaming')
     log_level = LaunchConfiguration('log_level')
-    
-    # Core Integration Nodes
+
+    audio_sample_rate = LaunchConfiguration('audio_sample_rate')
+    asr_model_path = LaunchConfiguration('asr_model_path')
+
+    # ----- Core Integration Nodes (保持你的原始设计) -----
     core_nodes = [
         Node(
             package='elderly_companion',
@@ -77,9 +78,10 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Audio Pipeline Nodes
+
+    # ----- Audio Pipeline -----
     audio_nodes = [
+        # VAD（稳定版，无torch/onnx依赖；接收 float32 PCM bytes）
         Node(
             package='elderly_companion',
             executable='silero_vad_node.py',
@@ -87,10 +89,21 @@ def generate_launch_description():
             output='screen',
             condition=IfCondition(enable_audio),
             parameters=[{
-                'audio.sample_rate': 16000,
-                'elderly.enable_optimization': True,
-            }]
+                'audio.sample_rate': audio_sample_rate,
+                'audio.channels': 1,
+                'audio.encoding': 'f32le',
+                'vad.frame_ms': 20,
+                'vad.hop_ms': 10,
+                'vad.threshold': 0.015,
+                'vad.min_speech_ms': 200,
+                'vad.max_sil_ms': 300,
+                'resample.to_16k': True,
+                'debug.log_energy': False,
+            }],
+            # 如需把你的麦克风话题映射到 /audio/raw_stream_in，请在这里加 remapping：
+            # remappings=[('/audio/raw_stream_in', '/your_mic_topic')],
         ),
+        # ASR（Zipformer2-CTC 优先；订阅 /audio/speech_segments）
         Node(
             package='elderly_companion',
             executable='speech_recognition_node.py',
@@ -98,10 +111,14 @@ def generate_launch_description():
             output='screen',
             condition=IfCondition(enable_audio),
             parameters=[{
+                'asr.model_path': asr_model_path,
                 'asr.language': 'zh-CN',
+                'asr.sample_rate': audio_sample_rate,
                 'asr.use_rknpu': PythonExpression(['"', deployment_target, '" == "rk3588"']),
+                'asr.chunk_length': 0.1,
             }]
         ),
+        # TTS（保留你的原TTS节点）
         Node(
             package='elderly_companion',
             executable='enhanced_tts_engine_node.py',
@@ -113,6 +130,7 @@ def generate_launch_description():
                 'language.primary': 'zh-CN',
             }]
         ),
+        # Emotion（保留你的情感分析节点）
         Node(
             package='elderly_companion',
             executable='emotion_analyzer_node.py',
@@ -124,8 +142,8 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Safety and Guard Nodes
+
+    # ----- Safety & Guard -----
     safety_nodes = [
         Node(
             package='elderly_companion',
@@ -134,9 +152,10 @@ def generate_launch_description():
             output='screen',
             condition=IfCondition(enable_safety),
             parameters=[{
-                'guard.enable_wakeword_detection': True,
-                'guard.enable_sos_detection': True,
-                'elderly.adaptations.enabled': True,
+                'guard.wakewords': ['小安', '小安小安', 'hey buddy'],
+                'guard.sos_keywords': ['救命', '不舒服', '急救', 'help', 'emergency'],
+                'guard.geofence.enabled': False,
+                'guard.geofence.allowed': [],
             }]
         ),
         Node(
@@ -161,8 +180,8 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Communication Nodes
+
+    # ----- Communication -----
     communication_nodes = [
         Node(
             package='elderly_companion',
@@ -185,8 +204,8 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Smart Home Nodes
+
+    # ----- Smart Home -----
     smart_home_nodes = [
         Node(
             package='elderly_companion',
@@ -210,8 +229,8 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Video Streaming Nodes
+
+    # ----- Video -----
     video_nodes = [
         Node(
             package='elderly_companion',
@@ -225,37 +244,34 @@ def generate_launch_description():
             }]
         )
     ]
-    
-    # Build launch description
+
+    # ----- LaunchDescription -----
     ld = LaunchDescription()
-    
-    # Add arguments
+
+    # Args & banner
     for arg in launch_args:
         ld.add_action(arg)
-    
-    # Add startup message
+
     ld.add_action(LogInfo(
         msg=[
-            '\n🤖 STARTING ELDERLY COMPANION ROBOT - ENHANCED SYSTEM\n',
-            'Mode: ', mode, ' | Target: ', deployment_target, '\n'
+            '\n🤖 STARTING ELDERLY COMPANION ROBOT - MERGED LAUNCH\n',
+            'Mode: ', mode, ' | Target: ', deployment_target, ' | SR: ', audio_sample_rate, '\n'
         ]
     ))
-    
-    # Add core nodes first
-    for node in core_nodes:
-        ld.add_action(node)
-    
-    # Add other node groups with delays
+
+    # 启动顺序：Core → Audio → Safety → Comm → SmartHome → Video（与原始一致）
+    for n in core_nodes:
+        ld.add_action(n)
+
     ld.add_action(TimerAction(period=5.0, actions=audio_nodes))
     ld.add_action(TimerAction(period=10.0, actions=safety_nodes))
     ld.add_action(TimerAction(period=15.0, actions=communication_nodes))
     ld.add_action(TimerAction(period=20.0, actions=smart_home_nodes))
     ld.add_action(TimerAction(period=25.0, actions=video_nodes))
-    
-    # Add completion message
+
     ld.add_action(TimerAction(
         period=35.0,
         actions=[LogInfo(msg='\n🎉 ELDERLY COMPANION ROBOT SYSTEM READY!\n')]
     ))
-    
+
     return ld
