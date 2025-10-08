@@ -79,3 +79,7 @@ def parse_intent(req: Req):
     except Exception:
         parsed = {"intent":"ask.clarification","need":"format","ask":"请再说一遍，或更具体一点","confidence":0}
     return parsed
+
+@APP.get("/health")
+def health():
+    return {"status": "healthy", "service": "guard_service"}

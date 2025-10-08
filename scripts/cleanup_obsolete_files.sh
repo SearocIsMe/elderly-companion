@@ -39,7 +39,7 @@ OBSOLETE_DIRS=(
     "src/router_agent/action/"
     "src/router_agent/msg/"
     "src/router_agent/srv/"
-    "src/router_agent/router_agent/nodes/"
+    "src/router_agent/nodes/"
     "data/configs/"
 )
 
@@ -172,7 +172,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "   ✓ scripts/launch.sh - 启动脚本"
     echo "   ✓ launch/enhanced_elderly_companion.launch.py - 主启动文件"
     echo "   ✓ src/router_agent/nodes/* - 增强版nodes"
-    echo "   ✓ src/router_agent/router_agent/ - 核心FastAPI服务"
+    echo "   ✓ src/router_agent/ - 核心FastAPI服务"
     echo ""
     echo "🎯 项目结构已优化，只保留核心功能文件"
     

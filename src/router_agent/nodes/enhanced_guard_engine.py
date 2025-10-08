@@ -977,10 +977,18 @@ class EnhancedGuardEngine(Node):
         super().__init__('enhanced_guard_engine')
         
         # Initialize sub-components
-        self.wakeword_engine = EnhancedWakewordEngine(self.get_logger())
-        self.geofence_monitor = GeoFenceSecurityMonitor(self.get_logger())
-        self.sos_detector = SOSKeywordsDetector(self.get_logger())
-        self.implicit_recognizer = ImplicitCommandRecognizer(self.get_logger())
+        try:
+            self.wakeword_engine = EnhancedWakewordEngine(self.get_logger())
+            self.geofence_monitor = GeoFenceSecurityMonitor(self.get_logger())
+            self.sos_detector = SOSKeywordsDetector(self.get_logger())
+            self.implicit_recognizer = ImplicitCommandRecognizer(self.get_logger())
+        except Exception as e:
+            self.get_logger().error(f"Guard engine component initialization failed: {e}")
+            # Initialize with None to prevent segfaults
+            self.wakeword_engine = None
+            self.geofence_monitor = None
+            self.sos_detector = None
+            self.implicit_recognizer = None
         
         # Conversation memory management
         self.conversation_memories: Dict[str, ConversationMemory] = {}
@@ -1051,6 +1059,11 @@ class EnhancedGuardEngine(Node):
         
         try:
             self.get_logger().info(f"Guard processing: '{msg.text}'")
+            
+            # Check if components are properly initialized
+            if not all([self.wakeword_engine, self.sos_detector, self.implicit_recognizer, self.geofence_monitor]):
+                self.get_logger().warning("Guard engine components not initialized properly, skipping processing")
+                return
             
             # Extract audio data if available
             audio_data = None  # Would extract from msg in production

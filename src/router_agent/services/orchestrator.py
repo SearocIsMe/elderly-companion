@@ -35,3 +35,7 @@ def handle_asr(req: AsrText):
         res = post(SIP_URL, {"callee":intent.get("callee","120"),"reason":intent.get("reason","unknown")})
         return {"status":"ok","adapter":"sip","result":res}
     return {"status":"ok","intent":intent}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "guard_service"}

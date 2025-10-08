@@ -172,7 +172,7 @@ class SIPVoIPAdapterNode(Node):
                 ('audio.codec', 'PCMU'),  # G.711 for compatibility
                 ('recording.enabled', True),
                 ('recording.format', 'wav'),
-                ('recording.directory', '/var/log/elderly_companion/calls'),
+                ('recording.directory', '/tmp/elderly_companion/calls'),
                 ('recording.max_file_size_mb', 100),
                 ('recording.retention_days', 30),
                 

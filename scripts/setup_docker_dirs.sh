@@ -29,7 +29,7 @@ fi
 
 # 2. 复制docker compose文件
 echo "🔄 Copying Docker compose files..."
-SOURCE_DOCKER_DIR="$PROJECT_ROOT/src/router_agent/router_agent/docker"
+SOURCE_DOCKER_DIR="$PROJECT_ROOT/src/router_agent/docker"
 
 if [ -d "$SOURCE_DOCKER_DIR" ]; then
     echo "🔍 Found source directory: $SOURCE_DOCKER_DIR"

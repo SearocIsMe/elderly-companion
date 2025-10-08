@@ -147,10 +147,18 @@ class FastAPIBridgeNode(Node):
                     self.get_logger().info(f"✅ {service_name} service available")
                 else:
                     unavailable_services.append(service_name)
-                    self.get_logger().warning(f"⚠️ {service_name} service responded with {response.status_code}")
+                    # For adapters service, this might be expected in development
+                    if service_name == 'adapters':
+                        self.get_logger().info(f"ℹ️  {service_name} service responded with {response.status_code} (expected in development)")
+                    else:
+                        self.get_logger().warning(f"⚠️ {service_name} service responded with {response.status_code}")
             except Exception as e:
                 unavailable_services.append(service_name)
-                self.get_logger().warning(f"❌ {service_name} service unavailable: {e}")
+                # For adapters service, this might be expected in development
+                if service_name == 'adapters':
+                    self.get_logger().info(f"ℹ️  {service_name} service unavailable (expected in development): {e}")
+                else:
+                    self.get_logger().warning(f"❌ {service_name} service unavailable: {e}")
         
         # Publish bridge status
         status_data = {

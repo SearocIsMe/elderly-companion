@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -16,3 +17,8 @@ class CallReq(BaseModel):
 @app.post("/sip/call")
 def sip_call(req: CallReq):
     return {"status":"dialing","callee":req.callee}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "adapters_stub"}
+

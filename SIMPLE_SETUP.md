@@ -295,6 +295,8 @@ source install/setup.bash
 
 # 2. Start FastAPI services
 cd src/router_agent/docker
+docker compose -f docker-compose.pc.yml down
+
 docker compose -f docker-compose.pc.yml up -d
 cd ../../..
 
@@ -303,6 +305,14 @@ curl http://localhost:7010/health  # Orchestrator
 curl http://localhost:7002/health  # Guard  
 curl http://localhost:7001/health  # Intent
 curl http://localhost:7003/health  # Adapters
+
+# 4. Check the logs
+
+docker logs docker-llamacpp-1
+docker logs docker-orchestrator-1
+docker logs docker-guard-1
+docker logs docker-intent-1
+docker logs docker-adapters-1
 ```
 
 ### 7.2 RK3588 Board Deployment

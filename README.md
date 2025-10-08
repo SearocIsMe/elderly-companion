@@ -301,7 +301,7 @@ For complete setup instructions, see [SIMPLE_SETUP.md](SIMPLE_SETUP.md).
 #### Development Mode
 ```bash
 # 1. Start FastAPI services
-cd src/router_agent/router_agent/docker
+cd src/router_agent/docker
 docker compose -f docker-compose.pc.yml up -d
 
 # 2. Launch enhanced ROS2 system  

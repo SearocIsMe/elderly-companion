@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 import yaml
@@ -12,6 +13,10 @@ class AsrIn(BaseModel):
 
 def has_kw(text, kws):
     return any(k in text for k in kws)
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "guard_service"}
 
 @app.post("/guard/check")
 def check(payload: AsrIn):

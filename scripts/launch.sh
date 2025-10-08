@@ -15,13 +15,15 @@ fi
 
 # 1. Start FastAPI services if available
 echo "🔧 Starting FastAPI services..."
-DOCKER_COMPOSE_FILE="src/router_agent/router_agent/docker/docker-compose.pc.yml"
+DOCKER_COMPOSE_FILE="src/router_agent/docker/docker-compose.pc.yml"
 
 if [ -f "$DOCKER_COMPOSE_FILE" ] && command -v docker-compose &> /dev/null; then
+    echo "shutdown the Docker services..."
+    cd src/router_agent/docker
+    docker compose -f docker-compose.pc.yml down
     echo "Starting Docker services..."
-    cd src/router_agent/router_agent/docker
     docker compose -f docker-compose.pc.yml up -d || echo "⚠️ Docker services failed, continuing..."
-    cd ../../../..
+    cd ../../..
     sleep 5
     
     # Test services
