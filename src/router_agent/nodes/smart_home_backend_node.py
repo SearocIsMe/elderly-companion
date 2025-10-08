@@ -315,13 +315,13 @@ class SmartHomeBackendNode(Node):
             return
             
         try:
-            self.mqtt_client = mqtt.Client()
+            self.mqtt_client = mqtt.Client(client_id="smart_home_backend", callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
             
             # Set authentication if provided
             if self.mqtt_username and self.mqtt_password:
                 self.mqtt_client.username_pw_set(self.mqtt_username, self.mqtt_password)
             
-            # Set callbacks
+            # Set callbacks (using newer API version)
             self.mqtt_client.on_connect = self.on_mqtt_connect
             self.mqtt_client.on_disconnect = self.on_mqtt_disconnect
             self.mqtt_client.on_message = self.on_mqtt_message
@@ -335,35 +335,32 @@ class SmartHomeBackendNode(Node):
             
         except Exception as e:
             self.get_logger().error(f"MQTT client initialization failed: {e}")
-
-    def on_mqtt_connect(self, client, userdata, flags, rc):
-        """Handle MQTT connection."""
+            
+    # 修改后（v2 回调）：
+    def on_mqtt_connect(self, client, userdata, flags, reasonCode, properties):
+        """Handle MQTT connection (MQTT v5/v2-callback)."""
+        # v2: reasonCode 是枚举/整型，0 表示成功
+        rc = int(reasonCode) if hasattr(reasonCode, '__int__') else reasonCode
         if rc == 0:
             self.mqtt_connected = True
             self.get_logger().info("MQTT client connected successfully")
-            
-            # Subscribe to device topics
             self.subscribe_to_device_topics()
-            
         else:
             self.get_logger().error(f"MQTT connection failed with code {rc}")
 
-    def on_mqtt_disconnect(self, client, userdata, rc):
-        """Handle MQTT disconnection."""
+    def on_mqtt_disconnect(self, client, userdata, reasonCode, properties):
+        """Handle MQTT disconnection (MQTT v5/v2-callback)."""
         self.mqtt_connected = False
-        self.get_logger().warning("MQTT client disconnected")
+        rc = int(reasonCode) if hasattr(reasonCode, '__int__') else reasonCode
+        self.get_logger().warning(f"MQTT client disconnected (code={rc})")
 
     def on_mqtt_message(self, client, userdata, msg):
-        """Handle MQTT message."""
+        """Handle MQTT message (same签名，v1/v2通用)."""
         try:
             topic = msg.topic
             payload = json.loads(msg.payload.decode())
-            
             self.get_logger().debug(f"MQTT message: {topic} -> {payload}")
-            
-            # Process device status updates
             self.process_mqtt_device_update(topic, payload)
-            
         except Exception as e:
             self.get_logger().error(f"MQTT message processing error: {e}")
 

@@ -23,6 +23,10 @@ tools/download_models.sh
 # 或自定义
 MODELS_DIR=/mnt/data/models LID_SIZE=base tools/download_models.sh
 
+# 创建软链接
+sudo ln -s ./models/vad /models
+sudo ln -s ./models/asr-zip-zh-en /models
+
 ```
 RK3588 如需更小模型，Zipformer/Paraformer 目录里通常带有 INT8 变体（*-int8*.onnx），脚本不需要改，运行脚本时在 run_streaming.sh 里选择对应文件名即可。
 

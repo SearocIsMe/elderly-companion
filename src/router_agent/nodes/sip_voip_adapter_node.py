@@ -434,6 +434,7 @@ class SIPVoIPAdapterNode(Node):
 
     def status_monitoring_loop(self):
         """Monitor system status and send updates to FastAPI bridge."""
+        self.get_logger().info(f"retrieve monitoring status is launched")
         while rclpy.ok():
             try:
                 if self.get_parameter('fastapi.enable_status_updates').value:
@@ -447,6 +448,7 @@ class SIPVoIPAdapterNode(Node):
 
     def recording_cleanup_loop(self):
         """Clean up old recordings based on retention policy."""
+        self.get_logger().info(f"recording cleanup is launched")
         while rclpy.ok():
             try:
                 self.cleanup_old_recordings()
@@ -471,6 +473,7 @@ class SIPVoIPAdapterNode(Node):
 
     def monitor_active_calls(self):
         """Monitor active calls for timeouts and status updates."""
+        self.get_logger().info(f"Active call monitoring is launched")
         try:
             current_time = datetime.now()
             expired_calls = []

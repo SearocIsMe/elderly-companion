@@ -71,8 +71,8 @@ paho-mqtt>=1.6.0
 
 # SIP/VoIP communication (requires system pjproject-dev)
 # Install system deps first: sudo apt install libpjproject-dev
-# pjsua2  # Uncomment after installing system dependencies
-
+#pjsua2  # Uncomment after installing system dependencies
+twilio
 # ============================================================================
 # COMPUTER VISION AND VIDEO
 # ============================================================================

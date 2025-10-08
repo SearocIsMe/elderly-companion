@@ -254,7 +254,7 @@ class MQTTAdapterNode(Node):
         try:
             self.mqtt_client = mqtt.Client(
                 client_id=self.get_parameter('mqtt.client_id').value,
-                clean_session=True
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION2
             )
             
             # Set credentials if provided
@@ -284,25 +284,22 @@ class MQTTAdapterNode(Node):
         except Exception as e:
             self.get_logger().error(f"MQTT client initialization failed: {e}")
 
-    def on_mqtt_connect(self, client, userdata, flags, rc):
-        """Handle MQTT connection callback."""
+    def on_mqtt_connect(self, client, userdata, flags, reasonCode, properties):
+        """Handle MQTT connection (MQTT v5/v2-callback)."""
+        # v2: reasonCode 是枚举/整型，0 表示成功
+        rc = int(reasonCode) if hasattr(reasonCode, '__int__') else reasonCode
         if rc == 0:
             self.mqtt_connected = True
-            self.get_logger().info("Connected to MQTT broker successfully")
-            
-            # Subscribe to device topics
+            self.get_logger().info("MQTT client connected successfully")
             self.subscribe_to_device_topics()
-            
         else:
             self.get_logger().error(f"MQTT connection failed with code {rc}")
 
-    def on_mqtt_disconnect(self, client, userdata, rc):
+    def on_mqtt_disconnect(self, client, userdata, reasonCode, properties):
         """Handle MQTT disconnection callback."""
         self.mqtt_connected = False
-        if rc != 0:
-            self.get_logger().warning("Unexpected MQTT disconnection")
-        else:
-            self.get_logger().info("MQTT disconnected")
+        rc = int(reasonCode) if hasattr(reasonCode, '__int__') else reasonCode
+        self.get_logger().warning(f"MQTT client disconnected (code={rc})")
 
     def on_mqtt_message(self, client, userdata, msg):
         """Handle MQTT message callback."""
@@ -318,9 +315,10 @@ class MQTTAdapterNode(Node):
         except Exception as e:
             self.get_logger().error(f"MQTT message processing error: {e}")
 
-    def on_mqtt_publish(self, client, userdata, mid):
-        """Handle MQTT publish callback."""
-        self.get_logger().debug(f"MQTT message published: {mid}")
+    # v2: (client, userdata, mid, reasonCode, properties)
+    def on_mqtt_publish(self, client, userdata, mid, reasonCode=None, properties=None, *extra):
+        rc = int(reasonCode) if reasonCode is not None and hasattr(reasonCode, '__int__') else reasonCode
+        self.get_logger().debug(f"published mid={mid} rc={rc}")
 
     def subscribe_to_device_topics(self):
         """Subscribe to device status topics."""

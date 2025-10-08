@@ -190,7 +190,7 @@ class SileroVADNode(Node):
                 ('audio.chunk_duration_ms', 100),  # 100ms chunks
                 ('audio.input_device_index', -1),  # Default device
                 ('audio.channels', 1),
-                ('vad.model_path', ''),  # Path to Silero VAD model
+                ('vad.model_path', '/models/vad/silero_vad.onnx'),  # Path to Silero VAD model
                 ('vad.threshold', 0.5),
                 ('vad.min_speech_duration_ms', 300),
                 ('vad.max_speech_duration_ms', 30000),
@@ -286,37 +286,57 @@ class SileroVADNode(Node):
         
         self.get_logger().info("Silero VAD Node initialized - Voice activity detection active")
 
+    
     def initialize_vad_model(self):
         """Initialize Silero VAD model."""
         try:
+            # Check if we have the required dependencies
+            if not torch.cuda.is_available():
+                self.get_logger().info("Using CPU for VAD processing")
+            
             model_path = self.get_parameter('vad.model_path').value
             
             if model_path and os.path.exists(model_path):
                 # Load custom model
-                self.vad_model = torch.jit.load(model_path)
-                self.vad_available = True
-                self.get_logger().info(f"Loaded custom Silero VAD model: {model_path}")
+                try:
+                    self.vad_model = torch.jit.load(model_path)
+                    self.vad_available = True
+                    self.get_logger().info(f"Loaded custom Silero VAD model: {model_path}")
+                except Exception as e:
+                    self.get_logger().warning(f"Failed to load custom Silero VAD model: {e}")
+                    self.vad_available = False
             else:
                 # Try to load pre-trained Silero VAD
                 try:
-                    self.vad_model, utils = torch.hub.load(
-                        repo_or_dir='snakers4/silero-vad',
-                        model='silero_vad',
-                        force_reload=False,
-                        onnx=False
-                    )
-                    self.vad_available = True
-                    self.get_logger().info("Loaded pre-trained Silero VAD model")
+                    # Check if torch.hub is available
+                    if not hasattr(torch, 'hub'):
+                        self.get_logger().warning("torch.hub not available")
+                        self.vad_available = False
+                    else:
+                        self.vad_model, utils = torch.hub.load(
+                            repo_or_dir='snakers4/silero-vad',
+                            model='silero_vad',
+                            force_reload=False,
+                            onnx=False
+                        )
+                        self.vad_available = True
+                        self.get_logger().info("Loaded pre-trained Silero VAD model")
                 except Exception as e:
-                    self.get_logger().warning(f"Failed to load Silero VAD: {e}")
+                    self.get_logger().warning(f"Failed to load pre-trained Silero VAD: {e}")
+                    # Fallback to energy-based VAD
                     self.vad_available = False
             
             if self.vad_available:
-                self.vad_model.eval()
+                # Set model to evaluation mode
+                if hasattr(self.vad_model, 'eval'):
+                    self.vad_model.eval()
+                self.get_logger().info("VAD model initialized successfully")
                 
         except Exception as e:
             self.get_logger().error(f"VAD model initialization error: {e}")
             self.vad_available = False
+            # Ensure we don't crash on initialization
+            self.get_logger().warning("VAD model initialization failed, falling back to energy-based detection")
 
     def initialize_audio_stream(self):
         """Initialize PyAudio stream."""
