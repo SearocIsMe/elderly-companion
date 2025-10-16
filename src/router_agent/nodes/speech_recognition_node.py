@@ -9,6 +9,7 @@ priority support for Zipformer2-CTC (asr-zip-zh-en) and fallback to Transducer.
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from rclpy.utilities import ok as rclpy_ok
 
 import numpy as np
 import threading
@@ -444,7 +445,11 @@ def main(args=None):
     except Exception as e:
         print(f"Error: {e}")
     finally:
-        rclpy.shutdown()
+        try:
+            if rclpy_ok():
+                rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

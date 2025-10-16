@@ -12,6 +12,7 @@ ROS2 SpeechResult -> FastAPI Orchestrator -> ROS2 Response
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from rclpy.utilities import ok as rclpy_ok
 
 import requests
 import json
@@ -430,7 +431,11 @@ def main(args=None):
     except Exception as e:
         print(f"FastAPI Bridge Node error: {e}")
     finally:
-        rclpy.shutdown()
+        try:
+            if rclpy_ok():
+                rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

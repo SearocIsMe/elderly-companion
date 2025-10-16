@@ -13,8 +13,17 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
-import librosa
+
+try:
+    from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+    _TRANSFORMERS_OK = True
+except Exception as e:
+    pipeline = None
+    AutoTokenizer = None
+    AutoModelForSequenceClassification = None
+    _TRANSFORMERS_OK = False
+
+
 import threading
 import time
 from typing import Optional, Dict, List, Tuple, Any
@@ -133,21 +142,24 @@ class EmotionAnalyzerNode(Node):
             # Initialize text-based emotion classifier
             self.get_logger().info("Loading text emotion classifier...")
             
-            # Use a Chinese emotion classification model or multilingual model
-            try:
-                self.text_emotion_classifier = pipeline(
-                    "text-classification",
-                    model="j-hartmann/emotion-english-distilroberta-base",
-                    device=0 if self.use_gpu else -1
-                )
-                self.get_logger().info("Text emotion classifier loaded successfully")
-            except Exception as e:
-                self.get_logger().warning(f"Failed to load advanced emotion model: {e}")
-                self.text_emotion_classifier = None
-            
-            # Initialize audio feature analyzer
-            self.initialize_audio_analyzer()
-            
+            if _TRANSFORMERS_OK:
+                # Use a Chinese emotion classification model or multilingual model
+                try:
+                    self.text_emotion_classifier = pipeline(
+                        "text-classification",
+                        model="j-hartmann/emotion-english-distilroberta-base",
+                        device=0 if self.use_gpu else -1
+                    )
+                    self.get_logger().info("Text emotion classifier loaded successfully")
+                except Exception as e:
+                    self.get_logger().warning(f"Failed to load advanced emotion model: {e}")
+                    self.text_emotion_classifier = None
+                
+                # Initialize audio feature analyzer
+                self.initialize_audio_analyzer()
+            else:
+                self.get_logger().info("transformers not installed; using basic emotion analyzer only")
+                
         except Exception as e:
             self.get_logger().error(f"Failed to initialize emotion models: {e}")
             self.text_emotion_classifier = None

@@ -244,8 +244,8 @@ If you encounter "distutils installed project" errors:
 pip install -r requirements.txt --ignore-installed sympy
 
 # Method 2: Use virtual environment (recommended for development)
-python3 -m venv elderly_companion_env
-source elderly_companion_env/bin/activate
+python3 -m venv robdog
+source ~/venvs/robdog/bin/activate
 pip install -r requirements.txt
 
 # Method 3: Force reinstall specific conflicting packages

@@ -14,6 +14,7 @@ Production-ready elderly-optimized speech synthesis with:
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from rclpy.utilities import ok as rclpy_ok
 
 import threading
 import time
@@ -642,7 +643,11 @@ def main(args=None):
     except Exception as e:
         print(f"Enhanced TTS Engine error: {e}")
     finally:
-        rclpy.shutdown()
+        try:
+            if rclpy_ok():
+                rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
