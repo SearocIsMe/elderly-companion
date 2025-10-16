@@ -282,7 +282,21 @@ class MQTTAdapterNode(Node):
             self.mqtt_client.loop_start()
             
         except Exception as e:
-            self.get_logger().error(f"MQTT client initialization failed: {e}")
+            first = not hasattr(self, "_mqtt_backoff_idx")
+            self.get_logger().error(f"MQTT client initialization failed: {e}") if first else \
+                self.get_logger().warning(f"MQTT reconnect pending: {e}")
+            # 指数退避：1,2,4,8,16… 最多 60s
+            self._mqtt_backoff_idx = getattr(self, "_mqtt_backoff_idx", -1) + 1
+            delay = min(60, 2 ** self._mqtt_backoff_idx)
+            self.create_timer(delay, self._retry_mqtt_once)
+
+    def _retry_mqtt_once(self):
+        # 只触发一次，后续计时器由 initialize_mqtt_client 再次设置
+        try:
+            self.initialize_mqtt_client()
+        finally:
+            # 取消当前一次性计时器（rclpy 单次 timer 不需手动取消）
+            pass
 
     def on_mqtt_connect(self, client, userdata, flags, reasonCode, properties):
         """Handle MQTT connection (MQTT v5/v2-callback)."""
@@ -360,7 +374,12 @@ class MQTTAdapterNode(Node):
     def discover_homeassistant_devices(self):
         """Discover devices from Home Assistant."""
         try:
+            if not self.ha_enabled:
+                return
             if not self.ha_url or not self.ha_token:
+                if not getattr(self, "_ha_missing_logged", False):
+                    self.get_logger().info("Home Assistant integration disabled or missing URL/Token; skipping discovery")
+                    self._ha_missing_logged = True
                 return
             
             headers = {

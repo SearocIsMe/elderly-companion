@@ -254,21 +254,112 @@ def generate_launch_description() -> LaunchDescription:
     # 其他可选组（safety / emergency / smart-home / video）
     # 这里仅放“占位/示例参数”，你可以继续用 WrapNode 添加自己的节点。
     # -----------------------------
+
+    # -----------------------------
+    # Safety / Guard（router_agent 包）
+    # -----------------------------
     safety_nodes = [
-        # *WrapNode(... 你的 Safety 节点 ...)
-        
+        *WrapNode(
+            package='elderly_companion',
+            executable='enhanced_guard_engine.py',
+            name='enhanced_guard_engine',
+            output='screen',
+            condition=IfCondition(enable_safety_systems),
+            parameters=[{
+                'guard.enable_wakeword_detection': True,
+                'guard.enable_sos_detection': True,
+                'elderly.adaptations.enabled': True,
+            }],
+        ),
+        *WrapNode(
+            package='elderly_companion',
+            executable='guard_fastapi_bridge_node.py',
+            name='guard_fastapi_bridge_node',
+            output='screen',
+            condition=IfCondition(enable_safety_systems),
+            parameters=[{
+                'fastapi.guard_url': 'http://localhost:7002',
+                'enhanced_guard.enable_sos_enhancement': True,
+            }],
+        ),
+        *WrapNode(
+            package='elderly_companion',
+            executable='safety_guard_node.py',
+            name='safety_guard_node',
+            output='screen',
+            condition=IfCondition(enable_safety_systems),
+            parameters=[{
+                'safety.emergency_response_time_ms': 100,
+            }],
+        ),
     ]
 
     emergency_nodes = [
         # *WrapNode(... 你的 SOS/SIP 网关节点 ...)
+        *WrapNode(
+            package='elderly_companion',
+            executable='sip_voip_adapter_node.py',
+            name='sip_voip_adapter_node',
+            output='screen',
+            condition=IfCondition(enable_emergency_services),
+            parameters=[{
+                'emergency.call_timeout_seconds': 45,
+                'elderly.longer_ring_duration': True,
+            }],
+        ),
+        *WrapNode(
+            package='elderly_companion',
+            executable='dialog_manager_node.py',
+            name='dialog_manager_node',
+            output='screen',
+            # 对话管理通常常驻，这里跟随 fastapi 服务一并启用
+            condition=IfCondition(enable_fastapi_services),
+            parameters=[{
+                'elderly.conversation_adaptations': True,
+            }],
+        ),
     ]
 
     smarthome_nodes = [
         # *WrapNode(... MQTT/Matter 适配器 ...)
+        *WrapNode(
+            package='elderly_companion',
+            executable='smart_home_backend_node.py',
+            name='smart_home_backend_node',
+            output='screen',
+            condition=IfCondition(enable_smart_home),
+            parameters=[{
+                'elderly.simplified_controls': True,
+                'safety.enable_emergency_automation': True,
+            }],
+        ),
+        *WrapNode(
+            package='elderly_companion',
+            executable='mqtt_adapter_node.py',
+            name='mqtt_adapter_node',
+            output='screen',
+            condition=IfCondition(enable_smart_home),
+            parameters=[{
+                'elderly.device_simplification': True,
+                'mqtt.username': 'admin',
+                'mqtt.password': 'DTC7788',
+            }],
+        ),
     ]
 
     video_nodes = [
         # *WrapNode(... WebRTC 上行，或相机节点 ...)
+        *WrapNode(
+            package='elderly_companion',
+            executable='webrtc_uplink_node.py',
+            name='webrtc_uplink_node',
+            output='screen',
+            condition=IfCondition(enable_video_streaming),
+            parameters=[{
+                'webrtc.server_port': 8080,
+                'emergency.auto_activate_streams': True,
+            }],
+        )
     ]
 
     # -----------------------------

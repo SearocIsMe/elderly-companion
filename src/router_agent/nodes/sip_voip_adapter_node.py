@@ -34,7 +34,8 @@ try:
     PJSUA_AVAILABLE = True
 except ImportError:
     PJSUA_AVAILABLE = False
-    print("Warning: pjsua2 not available, using mock implementation")
+    # 延迟到 Node 初始化后用 self.get_logger().warning 打一次
+    pass
 
 # Communication imports
 import smtplib
@@ -593,10 +594,9 @@ class SIPVoIPAdapterNode(Node):
     def initialize_sip_stack(self):
         """Initialize SIP/VoIP stack."""
         try:
-            if not PJSUA_AVAILABLE:
-                self.get_logger().warning("PJSUA2 not available - using mock implementation")
-                self.sip_initialized = True  # Mock initialization
-                return
+            if not PJSUA_AVAILABLE and not getattr(self, "_pjsua_warned", False):
+                self.get_logger().warning("pjsua2 not available - using mock implementation")
+                self._pjsua_warned = True
             
             if not self.sip_server or not self.sip_username:
                 self.get_logger().warning("SIP configuration incomplete - emergency calling may not work")

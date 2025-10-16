@@ -88,6 +88,97 @@ docker --version
 docker-compose --version
 ```
 
+
+### 2.3 Install MQTT
+
+```bash
+chmod +x scripts/install_mqtt
+./scripts/install_mqtt
+```
+
+Verify the mqtt:
+```
+Quick tests (in 2 new terminals):
+  <teminal1>: mosquitto_sub -h 127.0.0.1 -p 1883 -u 'admin' -P 'DTC7788' -t test -v
+  <teminal2>: mosquitto_pub -h 127.0.0.1 -p 1883 -u 'admin' -P 'DTC7788' -t test -m 'hello'
+
+teminal1, will print "test hello" msg out.
+```
+### 2.4 Install the pjsua2
+
+* clone the code
+```
+# 1. 使用GitHub官方仓库（避免官网下载速度问题）
+git clone https://github.com/pjsip/pjproject.git
+cd pjproject
+
+# 2. 检出稳定版本（文档未指定，推荐2.13）
+git checkout 2.13
+
+
+# 1. 检查 SWIG 版本
+swig -version
+
+# 2. 如果版本过旧，升级 SWIG
+sudo apt install swig
+
+# 3. 或者从源码安装最新版本
+wget https://sourceforge.net/projects/swig/files/swig/swig-4.1.1/swig-4.1.1.tar.gz
+tar -xzf swig-4.1.1.tar.gz
+cd swig-4.1.1
+./configure
+make -j4
+sudo make install
+
+
+```
+
+* Build from code
+
+```
+# 1. 安装所有依赖
+sudo apt update
+sudo apt install -y build-essential libasound2-dev libssl-dev libv4l-dev \
+    libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev \
+    libswscale-dev libsdl2-dev libspeex-dev libspeexdsp-dev uuid-dev \
+    python3-dev dos2unix
+
+## 安装 Speex 开发包
+    # 安装 Speex 相关的开发包
+    sudo apt install -y libspeex-dev libspeexdsp-dev
+
+    # 或者安装所有相关的音频处理库
+    sudo apt install -y libspeex-dev libspeexdsp-dev libsrtp2-dev
+
+# 2. 清理环境 
+make distclean
+find . -name "*.depend" -delete
+
+# 3. 配置
+./configure --enable-shared --prefix=/usr/local CFLAGS="-DFD_SETSIZE=2048"
+
+# 4. 生成依赖
+make dep || echo "Ignoring dep errors, continuing..."
+
+# 5. 编译
+make
+
+# 6. 安装
+sudo make install
+
+# 7. 完成核心库编译后，再处理 Python 绑定：
+
+# 进入 Python 绑定目录
+cd pjsip-apps/src/python
+2to3 -w setup.py
+
+# 编译 Python 绑定
+python3 setup.py build
+python3 setup.py install --user
+
+
+
+```
 ---
 
 ## 3. System Dependencies

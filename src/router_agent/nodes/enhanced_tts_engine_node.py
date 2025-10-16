@@ -64,6 +64,18 @@ from std_msgs.msg import String, Bool, Header
 #from audio_common_msgs.msg import AudioData
 from elderly_companion.msg import EmotionData
 
+def _parse_percent_or_int(val, default=0):
+    """Accept '0', 0, '+10%', '-5%' → 返回 int 百分比偏移（如 0/10/-5）"""
+    try:
+        if isinstance(val, (int, float)):
+           return int(val)
+        s = str(val).strip()
+        if s.endswith('%'):
+            s = s[:-1]
+        return int(s)
+    except Exception:
+        return default
+
 
 class VoiceType(Enum):
     """Voice types for different scenarios."""
@@ -223,15 +235,15 @@ class EnhancedTTSEngineNode(Node):
         self.fallback_engine = self.get_parameter('tts.fallback_engine').value
         self.voice_chinese = self.get_parameter('tts.voice_id_chinese').value
         self.voice_english = self.get_parameter('tts.voice_id_english').value
-        self.speech_rate = self.get_parameter('tts.rate').value
-        self.volume = self.get_parameter('tts.volume').value
+        self.speech_rate = _parse_percent_or_int(self.get_parameter("tts.rate").value, 0)
+        self.volume = _parse_percent_or_int(self.get_parameter("tts.volume").value, 0)
         self.elderly_rate_multiplier = self.get_parameter('elderly.speech_rate_multiplier').value
         self.sentence_pause = self.get_parameter('elderly.pause_between_sentences').value
         self.enable_emotion_modulation = self.get_parameter('emotion.enable_voice_modulation').value
         self.primary_language = self.get_parameter('language.primary').value
         self.enable_audio_enhancement = self.get_parameter('audio.enable_enhancement').value
         self.fastapi_bridge_url = self.get_parameter('fastapi.bridge_url').value
-        
+        self.pitch = _parse_percent_or_int(self.get_parameter("tts.pitch").value, 0)
         # Initialize TTS engines
         self.tts_engines = {}
         self.current_engine = None
