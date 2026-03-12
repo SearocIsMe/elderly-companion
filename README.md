@@ -151,6 +151,75 @@ graph TB
 - **RK3588 Edge**: Embedded deployment with NPU acceleration and local processing
 - **Production Server**: Full-scale deployment with GPU acceleration and cloud services
 
+### 2.4 Edge AI + ROS2 + NPU System Architecture
+
+```markdown
+                       Cloud / Remote Center
+                 ┌─────────────────────────────┐
+                 │  Monitoring / Data Platform │
+                 │  MQTT Broker / Storage      │
+                 │  AI Model Update            │
+                 └──────────────┬──────────────┘
+                                │
+                        MQTT / SRT / WebRTC
+                                │
+                                ▼
+                  ┌──────────────────────────┐
+                  │     Edge AI Gateway      │
+                  │   RK3588 Industrial Box  │
+                  │  (AI Edge Computing)     │
+                  └─────────────┬────────────┘
+                                │
+                    MediaMTX / ROS2 / MQTT
+                                │
+                                ▼
+         ┌──────────────────────────────────────────┐
+         │        AI Computing Node (Main)          │
+         │                                          │
+         │   RK3588 Development Board               │
+         │   (Radxa ROCK 5B+ / EAI Monster)         │
+         │                                          │
+         │  OS: Ubuntu 22.04                        │
+         │  ROS2: Humble Hawksbill                  │
+         │  Middleware: CycloneDDS                  │
+         │                                          │
+         │  AI Runtime                              │
+         │  librknnrt + rknn-toolkit-lite2          │
+         │                                          │
+         │  Local AI services                       │
+         │  Vision / Voice / Control                │
+         └──────────────┬───────────────┬───────────┘
+                        │               │
+                        │               │
+                        ▼               ▼
+
+           Vision System             Voice System
+     ┌─────────────────────┐   ┌─────────────────────┐
+     │  USB Industrial     │   │  ReSpeaker Mic      │
+     │  Camera (5MP MJPEG) │   │  Array V2.0         │
+     │                     │   │                     │
+     │ GStreamer pipeline  │   │ sherpa-onnx ASR     │
+     │ ROS2 camera node    │   │ Voice command       │
+     └──────────┬──────────┘   └──────────┬──────────┘
+                │                         │
+                ▼                         ▼
+          Vision AI                 Speech AI
+        Object detection           Voice control
+        tracking / SLAM           Robot command
+
+                        ▼
+                NPU Acceleration
+                RK3588 6 TOPS NPU
+                (RKNN models)
+
+                        ▼
+                Robot Control Layer
+                 ROS2 nodes
+                 Unitree SDK
+```
+
+
+
 ## 3. Project Structure
 
 ```
@@ -477,7 +546,7 @@ curl -s http://localhost:7010/asr_text \
 
 ## 9. System Requirements
 
-### Hardware Requirements
+### 9.1 Hardware Requirements
 
 #### Development Environment
 - **CPU**: Intel/AMD x64 with 4+ cores, 2.5GHz+
@@ -502,7 +571,7 @@ curl -s http://localhost:7010/asr_text \
 - **GPU**: NVIDIA GPU with 8GB+ VRAM for advanced AI features
 - **Network**: Gigabit Ethernet with stable internet for cloud services
 
-### Software Dependencies
+### 9.2 Software Dependencies
 
 See [SIMPLE_SETUP.md](SIMPLE_SETUP.md) for complete installation instructions.
 
@@ -520,5 +589,23 @@ See [SIMPLE_SETUP.md](SIMPLE_SETUP.md) for complete installation instructions.
 - **Home Assistant**: For advanced smart home integration
 
 ---
+
+## BOM List
+
+| Software Module    | Hardware Item               | Role                    |
+| ------------------ | --------------------------- | ----------------------- |
+| Ubuntu 22.04       | RK3588 development board    | Base OS                 |
+| ROS2 Humble        | RK3588 development board    | Robot middleware        |
+| CycloneDDS         | RK3588 board                | ROS2 communication      |
+| librknnrt          | RK3588 board                | NPU inference           |
+| rknn-toolkit-lite2 | RK3588 board                | Load RKNN model         |
+| sherpa-onnx        | ReSpeaker Mic Array         | Voice recognition       |
+| GStreamer          | USB camera                  | Video capture pipeline  |
+| MediaMTX           | RK3588 Edge AI Gateway      | Video routing           |
+| SRT                | Edge gateway                | Low bandwidth streaming |
+| Mosquitto MQTT     | Edge gateway / RK3588 board | IoT messaging           |
+| Unitree SDK        | RK3588 board                | Robot control           |
+
+
 
 **🤖 The Enhanced Elderly Companion Robot provides comprehensive elderly care with proven reliability, advanced safety features, and seamless family integration.**
